@@ -140,39 +140,40 @@ class TDMAsolver:
 
 # For tests:
 if __name__ == "__main__":
-
-    import matplotlib.pyplot as plt
-    N = 300
-    dim = 2
-    h = 1/(N-1)
-    a = np.zeros((N, dim, dim))
-    b = np.zeros_like(a)
-    c = np.zeros_like(a)
-    f = np.zeros((N, dim))
-    for i in range(1, N-1):
-        a[i][0][0] = 1
-        a[i][1][1] = 1
-        b[i][0][0] = 1
-        b[i][1][1] = 1
-        c[i][0][0] = 2
-        c[i][1][1] = 2 - (2.5*np.pi * h)**2
-    c[0][0][0] = 1
-    c[0][1][1] = 1
-    c[-1][0][0] = 1
-    c[-1][1][1] = 1
-    f[-1][0] = 1    
-    f[-1][1] = 1
+    pass
+    # import matplotlib.pyplot as plt
+    # N = 300
+    # dim = 2
+    # h = 1/(N-1)
+    # a = np.zeros((N, dim, dim))
+    # b = np.zeros_like(a)
+    # c = np.zeros_like(a)
+    # f = np.zeros((N, dim))
+    # for i in range(1, N-1):
+    #     a[i][1][1] = 1
+    #     b[i][1][1] = 1
+    #     c[i][0][0] = 1
+    #     c[i][1][1] = 2 
+    #     c[i][1][0] = h**2
+    #     f[i][0] = 1
+    # c[0][0][0] = 1
+    # c[0][1][1] = 1
+    # f[0][0] = 1
+    # c[-1][0][0] = 1
+    # c[-1][1][1] = 1
+    # f[-1][0] = 1    
+    # f[-1][1] = 1
     
-    solver = TDMAsolver(N, dim)
+    # solver = TDMAsolver(N, dim)
 
-    solver.setMatrixA(a)
-    solver.setMatrixB(b)
-    solver.setMatrixC(c)
-    solver.setMatrixF(f)
+    # solver.setMatrixA(a)
+    # solver.setMatrixB(b)
+    # solver.setMatrixC(c)
+    # solver.setMatrixF(f)
 
-    solver.solve()
-    solution = solver.getSolution()
-    plt.figure(1)
-    plt.plot(np.linspace(0, 1, N), solution[:,0],'b')
-    plt.plot(np.linspace(0, 1, N), solution[:,1],'r--')
-    plt.show()
+    # solver.solve()
+    # solution = solver.getSolution()
+    # plt.figure(1)
+    # plt.plot(np.linspace(0, 1, N), solution[:,0],'b')
+    # plt.plot(np.linspace(0, 1, N), solution[:,1],'r--')
+    # plt.show()
