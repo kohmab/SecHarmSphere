@@ -123,7 +123,7 @@ class Coefficients:
 
         
     @property
-    def beta0(self) -> np.nd:
+    def beta0(self):        
         """
             ∫ΛₘΛₘ₊₁dr 
         """ 

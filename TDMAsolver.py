@@ -13,9 +13,9 @@ class TDMAsolver:
         2) Create an object of the TDMAsolver class, like 
            solver  = TDMAsolver(N,d)   (N - number of grid nodes,
            d - number of equations in original ODE system)
-        3) Pass matrices into it using methods solver.setMatrix# (# = A,B,C,F)
+        3) Pass matrices into it using solver.# = smth (# = A,B,C,F)
         4) Calculate the solution by calling the solution.solve()
-        5) Get the solution from the object: solution  = solver.getSolution()
+        5) Solution is accessible with solver.solution
 
     """
 
@@ -38,19 +38,23 @@ class TDMAsolver:
     __alpha: np.ndarray
     __beta: np.ndarray
 
+    __dtype: np.dtype
+
     __WRONG_MATRIX_SIZE: str = "Wrong matrix size."
 
-    def __init__(self, N: int, dim: int = 1) -> None:
+    def __init__(self, N: int, dim: int = 1, dtype : np.dtype = np.double) -> None:
         self.__dim = dim
         self.__N = N
+        self.__dtype = dtype
+
         if dim == 1:
-            self.__solution = np.zeros(N)
-            self.__beta = np.zeros(N)
-            self.__alpha = np.zeros(N)
+            self.__solution = np.zeros(N,dtype=dtype)
+            self.__beta = np.zeros(N,dtype=dtype)
+            self.__alpha = np.zeros(N,dtype=dtype)
         else:
-            self.__solution = np.zeros((N, dim))
-            self.__beta = np.zeros((N, dim))
-            self.__alpha = np.zeros((N, dim, dim))
+            self.__solution = np.zeros((N, dim),dtype=dtype)
+            self.__beta = np.zeros((N, dim),dtype=dtype)
+            self.__alpha = np.zeros((N, dim, dim),dtype=dtype)
 
     def _checkMatrix1D(self, shape: typing.Tuple[int]) -> None:
         if self.__dim != 1 or self.__N != shape[0]:
@@ -72,7 +76,7 @@ class TDMAsolver:
         shape: typing.Tuple[int] = mat.shape
         if len(shape) == 1:
             self._checkMatrix1D(shape)
-            return
+            return      
         if len(shape) == 2:
             if self.__dim != shape[1] or self.__N != shape[0]:
                 raise RuntimeError(self.__WRONG_MATRIX_SIZE)
@@ -111,30 +115,52 @@ class TDMAsolver:
         for i in range(self.__N - 1, 0, -1):
             self.__solution[i-1] = np.dot(self.__alpha[i-1],
                                           self.__solution[i]) + self.__beta[i-1]
-
-    def setMatrixA(self, A: np.ndarray) -> None:
+            
+    @property
+    def A(self):
+        return self.__A 
+    
+    @A.setter
+    def A(self, A: np.ndarray):
         self._checkMatrixABC(A)
         self.__A = A
 
-    def setMatrixB(self, B: np.ndarray) -> None:
+    @property
+    def B(self):
+        return self.__B 
+
+
+    @B.setter
+    def B(self, B: np.ndarray):
         self._checkMatrixABC(B)
         self.__B = B
 
-    def setMatrixC(self, C: np.ndarray) -> None:
+    @property
+    def C(self):
+        return self.__C
+    
+    @C.setter
+    def C(self, C: np.ndarray):
         self._checkMatrixABC(C)
         self.__C = C
 
-    def setMatrixF(self, F: np.ndarray) -> None:
+    @property
+    def F(self):
+        return self.__F
+    
+    @F.setter
+    def F(self, F: np.ndarray):
         self._checkMatrixF(F)
         self.__F = F
 
     def solve(self) -> None:
         if self.__dim == 1:
             self._solve1D()
-        else:    
+        else:
             self._solveND()            
 
-    def getSolution(self) -> np.ndarray:
+    @property
+    def solution(self):
         return self.__solution
 
 
