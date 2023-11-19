@@ -63,12 +63,12 @@ class Coefficients:
 
     __intRsqdLdLp1: np.ndarray
     """
-        ∫r²Λₘ'Λₘ₊₁'dr 
+        -∫r²Λₘ'Λₘ₊₁'dr 
     """
 
     __intRsqdLdLm1: np.ndarray
     """
-        ∫r²Λₘ'Λₘ₋₁'dr 
+        -∫r²Λₘ'Λₘ₋₁'dr 
     """
 
     def __init__(self, N: int):
@@ -163,7 +163,7 @@ class Coefficients:
     @property
     def alpha2(self):
         """
-            ∫r²Λₘ'Λₘ₋₁'dr 
+            -∫r²Λₘ'Λₘ₋₁'dr 
         """ 
         return self.__intRsqdLdLm1
         
@@ -171,7 +171,7 @@ class Coefficients:
     @property
     def beta2(self):
         """
-            ∫r²Λₘ'Λₘ₊₁'dr 
+            -∫r²Λₘ'Λₘ₊₁'dr 
         """
         return self.__intRsqdLdLp1
     
