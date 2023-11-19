@@ -7,7 +7,7 @@ Galerkin method for test functions of form v = Λ_m LegendreP_n(cos (theta))
 """
 
 
-class coofitients:
+class Coofitients:
     __N: int
     """
         Number of grid nodes
@@ -123,7 +123,7 @@ class coofitients:
 
         
     @property
-    def beta0(self):
+    def beta0(self) -> np.nd:
         """
             ∫ΛₘΛₘ₊₁dr 
         """ 
