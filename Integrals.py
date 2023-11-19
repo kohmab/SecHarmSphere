@@ -7,7 +7,7 @@ Galerkin method for test functions of form v = Λ_m LegendreP_n(cos (theta))
 """
 
 
-class Coofitients:
+class Coefficients:
     __N: int
     """
         Number of grid nodes
