@@ -101,15 +101,18 @@ class Problem:
         self.__Ac[:, 0, 0] = self.__coef.alpha2 - \
             m * (m+1) * self.__coef.alpha0
         self.__Ac[:, 1, 1] = self.__Ac[:, 0, 0]
+        self.__Ac[:, 1, 0] = -4 * np.pi * self.__coef.alpha1
         self.__Av[:, 0, 0] = self.__coef.alpha1
 
         self.__Bc[:, 0, 0] = self.__coef.beta2 - m * (m+1) * self.__coef.beta0
         self.__Bc[:, 1, 1] = self.__Bc[:, 0, 0]
+        self.__Bc[:, 1, 0] = -4 * np.pi * self.__coef.beta1
         self.__Bv[:, 0, 0] = self.__coef.beta1
 
         self.__Cc[:, 0, 0] = self.__coef.gamma2 + \
             m * (m+1) * self.__coef.gamma0
         self.__Cc[:, 1, 1] = self.__Cc[:, 0, 0]
+        self.__Cc[:, 1, 0] = 4 * np.pi * self.__coef.gamma1
         self.__Cc[-1, 0, 1] -= 1. / (4 * np.pi * r0*r0) * epsD * (m + 1)
         self.__Cc[-1, 1, 1] += epsD * (m + 1)
         self.__Cv[:, 0, 0] = self.__coef.gamma1

@@ -7,9 +7,9 @@ def rhs(r, w):
 
 
 multipoleIndex = 0
-N = 1000
+N = 100
 epsD = 1
-r0 = 0.1
+r0 = 100
 nu = 0.1
 w = 1
 

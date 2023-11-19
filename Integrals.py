@@ -83,7 +83,7 @@ class Coefficients:
 
         # r^2 L_i L_j
         self.__intRsqLL = 2 * h * ( r*r + h*h / 10 ) / 3
-        self.__intRsqLL[0] = h / 30
+        self.__intRsqLL[0] = h ** 3 / 30
         self.__intRsqLL[-1] = h * ( 1 - h / 2 + h*h / 10 ) / 3
 
         self.__intRsqLLp1 = h * ( r*r + h*r + 3 * h*h / 10 ) / 6        
@@ -93,7 +93,7 @@ class Coefficients:
         self.__intRsqLLm1[0] = 0
 
         # r^2 dL_i dL_j
-        self.__intRsqdLdL = 2 / h * ( r*r + h*h / 3 ) / 3
+        self.__intRsqdLdL = 2 / h * ( r*r + h*h / 6 ) 
         self.__intRsqdLdL[0] = h / 3
         self.__intRsqdLdL[-1] = 1 / h * ( 1 - h + h*h / 3 ) 
 
