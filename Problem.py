@@ -87,9 +87,8 @@ class Problem:
             r0   - r0 = V0 / wp [a]
             epsD - Permittivity of external media
             rhs  - Rright hand side (source in the equation for rho). Function of r and freq
-            Q0   - The coefficient before the component of the potential outside the ball, 
-                   which increases with increasing radius (in the case of a multipole 
-                   index equal to one, this is the external field strength with a minus sign)
+            Q0   - The coefficient before the component of the potential outside the sphere,                                            
+                   which increases with increasing radius (φₑₓₜ = Q₀ rᵐ + C / rᵐ⁺¹)
         """
         self.__coef = Coefficients(N)
         self.__solver = Solver(N, self.__DIM, dtype=complex)
