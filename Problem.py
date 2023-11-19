@@ -32,11 +32,11 @@ class Problem:
 
     __Cv: np.ndarray
 
-    __Fv: np.ndarray
-
     __rhsArr: np.ndarray
 
     __rhsFunc: Callable[[np.ndarray, np.double], np.ndarray]
+
+    __Q0: np.double
 
     __solver: Solver
 
@@ -67,18 +67,29 @@ class Problem:
         self.__solver.F[-1, 0] = - self.__coef.gamma1[-1] * self.__rhsArr[-1] \
             - self.__coef.alpha1[-1] * self.__rhsArr[-2]
 
+        self.__solver.F[-1, 0] -= self.__Q0 * self.__epsD * \
+            (2*self.__multipoleNo + 1) / (4*np.pi * self.__r0**2)
+        self.__solver.F[-1, 1] += self.__Q0 * self.__epsD * \
+            (2*self.__multipoleNo + 1)
+
+    def __zeroRHS(self, r: np.ndarray, w: np.double) -> np.ndarray:
+        return np.zeros(self.__coef.N)
+
     def __init__(self, N: int, m: int,
-                 nu: np.double, w: np.double,
-                 r0: np.double, epsD: np.double,
-                 rhs: Callable[[np.ndarray, np.double], np.ndarray]) -> None:
+                 nu: np.double,  w: np.double,
+                 r0: np.double,  epsD: np.double,
+                 rhs: Callable[[np.ndarray, np.double], np.ndarray] = None, Q0: np.double = 0) -> None:
         """
-            N - number of grid points
-            m - multipole index
-            nu - collisiton frequency [wp]
-            w - initial frequency [wp]
-            r0 - r0 = V0 / wp [a]
-            epsD - permittivity of external media
-            rhs - right hand side (source in the equation for rho). Function of r and freq
+            N    - Number of grid points
+            m    - Multipole index
+            nu   - Collisiton frequency [wp]
+            w    - Frequency [wp]
+            r0   - r0 = V0 / wp [a]
+            epsD - Permittivity of external media
+            rhs  - Rright hand side (source in the equation for rho). Function of r and freq
+            Q0   - The coefficient before the component of the potential outside the ball, 
+                   which increases with increasing radius (in the case of a multipole 
+                   index equal to one, this is the external field strength with a minus sign)
         """
         self.__coef = Coefficients(N)
         self.__solver = Solver(N, self.__DIM, dtype=complex)
@@ -89,7 +100,8 @@ class Problem:
         self.__freq = w
         self.__r0 = r0
 
-        self.__rhsFunc = rhs
+        self.__rhsFunc = rhs if rhs is not None else self.__zeroRHS
+        self.__Q0 = Q0
 
         self.__Ac = np.zeros((N, self.__DIM, self.__DIM), dtype=complex)
         self.__Bc = np.zeros_like(self.__Ac, dtype=complex)
@@ -99,20 +111,21 @@ class Problem:
         self.__Cv = np.zeros_like(self.__Ac, dtype=complex)
 
         self.__Ac[:, 0, 0] = self.__coef.alpha2 - \
-            m * (m+1) * self.__coef.alpha0
+            m * (m + 1) * self.__coef.alpha0
         self.__Ac[:, 1, 1] = self.__Ac[:, 0, 0]
-        self.__Ac[:, 1, 0] = -4 * np.pi * self.__coef.alpha1
+        self.__Ac[:, 1, 0] = 4 * np.pi * self.__coef.alpha1
         self.__Av[:, 0, 0] = self.__coef.alpha1
 
-        self.__Bc[:, 0, 0] = self.__coef.beta2 - m * (m+1) * self.__coef.beta0
+        self.__Bc[:, 0, 0] = self.__coef.beta2 - \
+            m * (m + 1) * self.__coef.beta0
         self.__Bc[:, 1, 1] = self.__Bc[:, 0, 0]
-        self.__Bc[:, 1, 0] = -4 * np.pi * self.__coef.beta1
+        self.__Bc[:, 1, 0] = 4 * np.pi * self.__coef.beta1
         self.__Bv[:, 0, 0] = self.__coef.beta1
 
         self.__Cc[:, 0, 0] = self.__coef.gamma2 + \
-            m * (m+1) * self.__coef.gamma0
+            m * (m + 1) * self.__coef.gamma0
         self.__Cc[:, 1, 1] = self.__Cc[:, 0, 0]
-        self.__Cc[:, 1, 0] = 4 * np.pi * self.__coef.gamma1
+        self.__Cc[:, 1, 0] = -4 * np.pi * self.__coef.gamma1
         self.__Cc[-1, 0, 1] -= 1. / (4 * np.pi * r0*r0) * epsD * (m + 1)
         self.__Cc[-1, 1, 1] += epsD * (m + 1)
         self.__Cv[:, 0, 0] = self.__coef.gamma1
@@ -120,6 +133,10 @@ class Problem:
         self._updateFreq()
 
     def setFreq(self, w: np.double) -> None:
+        """
+            Changes the frequency of the oscillation sourse
+        """
+
         if self.__freq == w:
             return
         self.__freq = w
@@ -142,4 +159,3 @@ class Problem:
 
 if __name__ == "__main__":
     pass
-    
