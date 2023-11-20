@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from Integrals import Coefficients
 from Problem import Problem
 
 from scipy.special import spherical_jn
@@ -10,11 +11,11 @@ def rhs(r, w):
 
 
 multipoleIndex = 0
-N = 51
+N = 101
 epsD = 22
 r0 = .1
 nu = 0.01
-w = 0.4
+w = 1.4
 k0 = 10
 
 
