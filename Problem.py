@@ -4,7 +4,25 @@ from TDMAsolver import TDMAsolver as Solver
 from Integrals import Coefficients
 
 
+
+
 class Problem:
+    """
+        Class for solving system of equations, determining\n 
+        the forced oscillations of the plasma sphere of unit radius.\n 
+        These equations are of form\n
+
+            Δρ + kₚ²(ω)ρ = RHS(r,ω) Pₘ(cos θ),\n
+            Δφ = -4πρ,\n
+
+        and boundary conditions at r = 1 are\n
+
+            ∂ᵣφ = -4π∂ᵣρ = ε₀[ (2m+1)Q₀ - (m+1)φ ].\n
+
+        It is assumed that the potential outside the sphere has the form\n
+
+            φₑₓₜ = [Q₀ rᵐ + C / rᵐ⁺¹] Pₘ(cos θ).
+    """
 
     __DIM: int = 2
 
@@ -80,15 +98,15 @@ class Problem:
                  r0: np.double,  epsD: np.double,
                  rhs: Callable[[np.ndarray, np.double], np.ndarray] = None, Q0: np.double = 0) -> None:
         """
-            N    - Number of grid points
-            m    - Multipole index
-            nu   - Collisiton frequency [wp]
-            w    - Frequency [wp]
-            r0   - r0 = V0 / wp [a]
-            epsD - Permittivity of external media
-            rhs  - Rright hand side (source in the equation for rho). Function of r and freq
-            Q0   - The coefficient before the component of the potential outside the sphere,                                            
-                   which increases with increasing radius (φₑₓₜ = Q₀ rᵐ + C / rᵐ⁺¹)
+            N    - Number of grid points\n
+            m    - Multipole index\n
+            nu   - Collisiton frequency [wp]\n
+            w    - Frequency [wp]\n
+            r0   - V0 / SphereRadius / wp  , \n
+            epsD - Permittivity of external media (ε₀)\n
+            rhs  - Rright hand side (source in the equation for rho). Function of r and freq\n
+            Q0   - The coefficient before the component of the potential outside the sphere,\n
+                   which increases with increasing radius (φₑₓₜ = Q₀ rᵐ + C / rᵐ⁺¹)\n
         """
         self.__coef = Coefficients(N)
         self.__solver = Solver(N, self.__DIM, dtype=complex)
@@ -148,10 +166,19 @@ class Problem:
         self.__solved = True
 
     def getPhi(self) -> np.ndarray:
+        """
+            Returns the grid values of radial function Φ(r) determining\n
+            the complex amplitude of the potential in sphere φ = Φ(r) Pₘ(cos θ).
+        """
+
         self._solve()
         return self.__solver.solution[:, 1]
 
     def getRho(self) -> np.ndarray:
+        """
+            Returns the grid values of radial function R(r) determining\n
+            the complex amplitude of the plasma density in sphere ρ = R(r) Pₘ(cos θ).
+        """
         self._solve()
         return self.__solver.solution[:, 0]
 
