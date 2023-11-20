@@ -17,7 +17,7 @@ class Problem:
 
         and boundary conditions at r = 1 are\n
 
-            ∂ᵣφ = -4π∂ᵣρ = ε₀[ (2m+1)Q₀ - (m+1)φ ].\n
+            ∂ᵣφ = -4π r₀² ∂ᵣρ = ε₀[ (2m+1)Q₀ - (m+1)φ ].\n
 
         It is assumed that the potential outside the sphere has the form\n
 
