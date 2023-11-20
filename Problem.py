@@ -167,7 +167,6 @@ class Problem:
             Returns the grid values of radial function Φ(r) determining\n
             the complex amplitude of the potential in sphere φ = Φ(r) Pₘ(cos θ).
         """
-
         self._solve()
         return self.__solver.solution[:, 1]
 
