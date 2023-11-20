@@ -3,7 +3,7 @@ import numpy as np
 from TDMAsolver import TDMAsolver as Solver
 from Integrals import Coefficients
 
-
+ 
 class Problem:
     """
         Class for solving system of equations, determining\n 
