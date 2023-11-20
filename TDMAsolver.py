@@ -4,7 +4,7 @@ import typing
 
 class TDMAsolver:
     """
-        Implements tridiagonal matrix algorythm.
+        Implements tridiagonal matrix algorithm.
         The designations are the same as in the book Samarsky, Nikolaev.
 
         Usage:
