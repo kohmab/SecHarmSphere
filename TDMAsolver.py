@@ -4,18 +4,18 @@ import typing
 
 class TDMAsolver:
     """
-        Implements tridiagonal matrix algorithm.
-        The designations are the same as in the book Samarsky, Nikolaev.
+    Implements tridiagonal matrix algorithm.
+    The designations are the same as in the book Samarsky, Nikolaev.
 
-        Usage:
+    Usage:
 
-        1) Create matrices A,B,C, and F
-        2) Create an object of the TDMAsolver class, like 
-           solver  = TDMAsolver(N,d)   (N - number of grid nodes,
-           d - number of equations in original ODE system)
-        3) Pass matrices into it using solver.# = smth (# = A,B,C,F)
-        4) Calculate the solution by calling the solution.solve()
-        5) Solution is accessible with solver.solution
+    1) Create matrices A,B,C, and F
+    2) Create an object of the TDMAsolver class, like
+       solver  = TDMAsolver(N,d)   (N - number of grid nodes,
+       d - number of equations in original ODE system)
+    3) Pass matrices into it using solver.# = smth (# = A,B,C,F)
+    4) Calculate the solution by calling the solution.solve()
+    5) Solution is accessible with solver.solution
 
     """
 
@@ -42,19 +42,19 @@ class TDMAsolver:
 
     __WRONG_MATRIX_SIZE: str = "Wrong matrix size."
 
-    def __init__(self, N: int, dim: int = 1, dtype : np.dtype = np.double) -> None:
+    def __init__(self, N: int, dim: int = 1, dtype: np.dtype = np.double) -> None:
         self.__dim = dim
         self.__N = N
         self.__dtype = dtype
 
         if dim == 1:
-            self.__solution = np.zeros(N,dtype=dtype)
-            self.__beta = np.zeros(N,dtype=dtype)
-            self.__alpha = np.zeros(N,dtype=dtype)
+            self.__solution = np.zeros(N, dtype=dtype)
+            self.__beta = np.zeros(N, dtype=dtype)
+            self.__alpha = np.zeros(N, dtype=dtype)
         else:
-            self.__solution = np.zeros((N, dim),dtype=dtype)
-            self.__beta = np.zeros((N, dim),dtype=dtype)
-            self.__alpha = np.zeros((N, dim, dim),dtype=dtype)
+            self.__solution = np.zeros((N, dim), dtype=dtype)
+            self.__beta = np.zeros((N, dim), dtype=dtype)
+            self.__alpha = np.zeros((N, dim, dim), dtype=dtype)
 
     def _checkMatrix1D(self, shape: typing.Tuple[int]) -> None:
         if self.__dim != 1 or self.__N != shape[0]:
@@ -76,7 +76,7 @@ class TDMAsolver:
         shape: typing.Tuple[int] = mat.shape
         if len(shape) == 1:
             self._checkMatrix1D(shape)
-            return      
+            return
         if len(shape) == 2:
             if self.__dim != shape[1] or self.__N != shape[0]:
                 raise RuntimeError(self.__WRONG_MATRIX_SIZE)
@@ -88,38 +88,43 @@ class TDMAsolver:
         self.__beta[0] = self.__F[0] / self.__C[0]
 
         for i in range(1, self.__N):
-            denumenator = self.__C[i] - self.__alpha[i-1]*self.__A[i]
+            denumenator = self.__C[i] - self.__alpha[i - 1] * self.__A[i]
             self.__alpha[i] = self.__B[i] / denumenator
-            self.__beta[i] = (self.__F[i] + self.__A[i] *
-                              self.__beta[i-1]) / denumenator
+            self.__beta[i] = (
+                self.__F[i] + self.__A[i] * self.__beta[i - 1]
+            ) / denumenator
 
         self.__solution[-1] = self.__beta[-1]
 
         for i in range(self.__N - 1, 0, -1):
-            self.__solution[i-1] = self.__alpha[i-1] * \
-                self.__solution[i] + self.__beta[i-1]
+            self.__solution[i - 1] = (
+                self.__alpha[i - 1] * self.__solution[i] + self.__beta[i - 1]
+            )
 
     def _solveND(self) -> None:
         denumenator = np.linalg.inv(self.__C[0])
         self.__alpha[0] = np.dot(denumenator, self.__B[0])
         self.__beta[0] = np.dot(denumenator, self.__F[0])
 
-        for i in range(1, self.__N):            
+        for i in range(1, self.__N):
             denumenator = np.linalg.inv(
-                self.__C[i] - np.dot(self.__A[i], self.__alpha[i-1]))
+                self.__C[i] - np.dot(self.__A[i], self.__alpha[i - 1])
+            )
             self.__alpha[i] = np.dot(denumenator, self.__B[i])
-            self.__beta[i] = np.dot(denumenator, self.__F[i] + np.dot(self.__A[i],
-                                                                      self.__beta[i-1]))
+            self.__beta[i] = np.dot(
+                denumenator, self.__F[i] + np.dot(self.__A[i], self.__beta[i - 1])
+            )
         self.__solution[-1] = self.__beta[-1]
 
         for i in range(self.__N - 1, 0, -1):
-            self.__solution[i-1] = np.dot(self.__alpha[i-1],
-                                          self.__solution[i]) + self.__beta[i-1]
-            
+            self.__solution[i - 1] = (
+                np.dot(self.__alpha[i - 1], self.__solution[i]) + self.__beta[i - 1]
+            )
+
     @property
     def A(self):
-        return self.__A 
-    
+        return self.__A
+
     @A.setter
     def A(self, A: np.ndarray):
         self._checkMatrixABC(A)
@@ -127,8 +132,7 @@ class TDMAsolver:
 
     @property
     def B(self):
-        return self.__B 
-
+        return self.__B
 
     @B.setter
     def B(self, B: np.ndarray):
@@ -138,7 +142,7 @@ class TDMAsolver:
     @property
     def C(self):
         return self.__C
-    
+
     @C.setter
     def C(self, C: np.ndarray):
         self._checkMatrixABC(C)
@@ -147,7 +151,7 @@ class TDMAsolver:
     @property
     def F(self):
         return self.__F
-    
+
     @F.setter
     def F(self, F: np.ndarray):
         self._checkMatrixF(F)
@@ -157,7 +161,7 @@ class TDMAsolver:
         if self.__dim == 1:
             self._solve1D()
         else:
-            self._solveND()            
+            self._solveND()
 
     @property
     def solution(self):
@@ -179,7 +183,7 @@ if __name__ == "__main__":
     #     a[i][1][1] = 1
     #     b[i][1][1] = 1
     #     c[i][0][0] = 1
-    #     c[i][1][1] = 2 
+    #     c[i][1][1] = 2
     #     c[i][1][0] = h**2
     #     f[i][0] = 1
     # c[0][0][0] = 1
@@ -187,9 +191,9 @@ if __name__ == "__main__":
     # f[0][0] = 1
     # c[-1][0][0] = 1
     # c[-1][1][1] = 1
-    # f[-1][0] = 1    
+    # f[-1][0] = 1
     # f[-1][1] = 1
-    
+
     # solver = TDMAsolver(N, dim)
 
     # solver.setMatrixA(a)
