@@ -8,11 +8,11 @@ def rhs(r, w):
 
 
 multipoleIndex = 1
-N = 501
+N = 51
 epsD = 1
-r0 = .01
+r0 = .1
 nu = 0.1
-w = 0.1
+w = 0.4
 
 p: Problem = Problem(N, multipoleIndex, nu, w, r0, epsD, rhs = None, Q0=-1)
 

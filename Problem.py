@@ -4,8 +4,6 @@ from TDMAsolver import TDMAsolver as Solver
 from Integrals import Coefficients
 
 
-
-
 class Problem:
     """
         Class for solving system of equations, determining\n 
@@ -153,11 +151,10 @@ class Problem:
         """
             Changes the frequency of the oscillation sourse
         """
-
         if self.__freq == w:
             return
         self.__freq = w
-        self._updateFreq
+        self._updateFreq()
 
     def _solve(self) -> None:
         if self.__solved:
