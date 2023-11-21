@@ -9,13 +9,13 @@ class TDMAsolver:
 
     Usage:
 
-    1) Create matrices A,B,C, and F
-    2) Create an object of the TDMAsolver class, like
-       solver  = TDMAsolver(N,d)   (N - number of grid nodes,
-       d - number of equations in original ODE system)
-    3) Pass matrices into it using solver.# = smth (# = A,B,C,F)
-    4) Calculate the solution by calling the solution.solve()
-    5) Solution is accessible with solver.solution
+        1) Create matrices A,B,C, and F
+        2) Create an object of the TDMAsolver class, like 
+           solver  = TDMAsolver(N,d,dtype = someDataType)   (N - number of grid nodes,
+           d - number of equations in original ODE system)
+        3) Pass matrices into it using solver.# = someNumpyArray (# = A,B,C,F)
+        4) Calculate the solution by calling the solver.solve()
+        5) Solution is accessible with solver.solution
 
     """
 
