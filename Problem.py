@@ -120,7 +120,7 @@ class Problem:
         epsD - Permittivity of external media (ε₀)\n
         rhs  - Rright hand side (source in the equation for rho). Function of r and freq\n
         Q0   - The coefficient before the component of the potential outside the sphere,\n
-               which increases with increasing radius (φₑₓₜ = Q₀ rᵐ + C / rᵐ⁺¹)\n
+               which increases with increasing radius (φₑₓₜ ~ Q₀ rᵐ + C / rᵐ⁺¹)\n
         """
         self.__coef = Coefficients(N)
         self.__solver = Solver(N, self.__DIM, dtype=complex)
