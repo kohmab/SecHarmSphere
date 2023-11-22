@@ -30,7 +30,7 @@ p: Problem = Problem(N, multipoleIndex, nu, w, r0, epsD, rhs=rhs)
 phi = p.getPhi()
 rho = p.getRho()
 
-r = np.linspace(0, 1, N)
+r = p.getR()
 
 
 eps = 1 - 1.0 / w / (w + 1j * nu)

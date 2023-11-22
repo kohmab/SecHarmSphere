@@ -10,25 +10,26 @@ def rhs(r, w):
 multipoleIndex = 1
 N = 51
 epsD = 1
-r0 = .1
+r0 = 0.1
 nu = 0.1
 w = 0.4
 
-p: Problem = Problem(N, multipoleIndex, nu, w, r0, epsD, rhs = None, Q0=-1)
+p: Problem = Problem(N, multipoleIndex, nu, w, r0, epsD, rhs=None, Q0=-1)
 
 phi = p.getPhi()
 rho = p.getRho()
 
-r = np.linspace(0, 1, N)
+r = p.getR()
 
 
-eps = 1 - 1. / w / (w + 1j*nu)
-kpa = np.sqrt(w * (w + 1j*nu) - 1) / r0 
+eps = 1 - 1.0 / w / (w + 1j * nu)
+kpa = np.sqrt(w * (w + 1j * nu) - 1) / r0
 from scipy.special import spherical_jn
-G = lambda r : spherical_jn(1,r*kpa) / spherical_jn(1,kpa,True) / kpa
-C1 = -3*epsD / ( eps + 2*epsD * ( 1 + (eps - 1) * G(1) ) )
-rho_teor = - eps / (4 * np.pi * r0**2) * C1 * G(r)
-phi_teor = C1*r + 4 * np.pi / kpa ** 2 * rho_teor
+
+G = lambda r: spherical_jn(1, r * kpa) / spherical_jn(1, kpa, True) / kpa
+C1 = -3 * epsD / (eps + 2 * epsD * (1 + (eps - 1) * G(1)))
+rho_teor = -eps / (4 * np.pi * r0**2) * C1 * G(r)
+phi_teor = C1 * r + 4 * np.pi / kpa**2 * rho_teor
 
 
 plt.figure(1)

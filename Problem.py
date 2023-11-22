@@ -60,6 +60,8 @@ class Problem:
 
     __solved: bool
 
+    __r: np.ndarray
+
     def _updateFreq(self):
         self.__solved = False
 
@@ -71,7 +73,7 @@ class Problem:
         self.__solver.B = self.__Bc + self.__Bv * self.__kpaSq
         self.__solver.C = self.__Cc - self.__Cv * self.__kpaSq
 
-        self.__rhsArr = self.__rhsFunc(np.linspace(0, 1, self.__coef.N), self.__freq)
+        self.__rhsArr = self.__rhsFunc(self.__r, self.__freq)
 
         self.__solver.F = np.zeros((self.__coef.N, self.__DIM), dtype=complex)
 
@@ -124,6 +126,7 @@ class Problem:
         """
         self.__coef = Coefficients(N)
         self.__solver = Solver(N, self.__DIM, dtype=complex)
+        self.__r = np.linspace(0, 1, N)
 
         self.__multipoleNo = m
         self.__epsD = epsD
@@ -190,6 +193,12 @@ class Problem:
         """
         self._solve()
         return self.__solver.solution[:, 0]
+
+    def getR(self) -> np.ndarray:
+        """
+        Returns the grid
+        """
+        return self.__r
 
 
 if __name__ == "__main__":
