@@ -87,11 +87,11 @@ class FreqFinder:
 
         def spFails():
             raise Exception(
-                """Can not calculate surface resonance permittivity for surface plasmon""")
+                """Can not calculate resonance permittivity for surface plasmon""")
 
         result = np.zeros(Nz)
 
-        # Surface palsmon:
+        # Surface plasmon:
         spGuess = guesses[0]
         spRootResult = so.root_scalar(F, x0=spGuess, xtol=self.__xtol)
         if not spRootResult.converged:
@@ -135,14 +135,14 @@ class FreqFinder:
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     nu = 0.1
-    r0 = .145
+    r0 = .01
 
     ss.jn_zeros
     epsD = 1
     ff = FreqFinder(r0, nu, epsD)
-    n = 2
+    n = 21
     eps = np.linspace(-2, 1, 100000)
-    Nz = 20
+    Nz = 50
 
     zf = ff.zeroFunc(n, eps)
     zeros0 = FreqFinder._FreqFinder__genGuessEps(n, Nz, r0, epsD)
