@@ -1,4 +1,4 @@
-from scipy.special import j1, spherical_jn, jve
+from scipy.special import spherical_jn, jve
 import numpy as np
 import matplotlib.pyplot as plt
 
