@@ -14,41 +14,41 @@ class FreqFinder:
     """
     @staticmethod
     @numba.njit
-    def __kp(eps, r0):
-        return np.sqrt(eps/(1.-eps) + 0j)/r0
+    def __kp(eps, r0, epsInf):
+        return np.sqrt(eps/(epsInf-eps)/epsInf + 0j)/r0
 
     @staticmethod
     @numba.njit
-    def __eps(w, nu):
-        return 1 - 1./w/(w - 1j*nu)
+    def __eps(w, nu, epsInf):
+        return epsInf - 1./w/(w - 1j*nu)
 
     @staticmethod
-    def __wFromEps(eps, nu):
-        return np.sqrt(1./(1.-eps)-nu**2/4 + 0j) + 0.5j*nu
+    def __wFromEps(eps, nu, epsInf):
+        return np.sqrt(1./(epsInf-eps)-nu**2/4 + 0j) + 0.5j*nu
 
     @staticmethod
-    def __epsFromKp(kp, r0):
-        x = np.square(kp*r0)
-        return x/(1+x)
+    def __epsFromKp(kp, r0, epsInf):
+        x = np.square(kp*r0)*epsInf
+        return x/(1+x)*epsInf
 
     @staticmethod
-    def __zeroFunction(n, eps, r0, epsD):
-        kp = FreqFinder.__kp(eps, r0)
+    def __zeroFunction(n, eps, r0, epsD, epsInf):
+        kp = FreqFinder.__kp(eps, r0, epsInf)
         j = ss.jve(n + 0.5, kp)
         djkp = n*j - ss.jve(n + 1.5, kp)*kp
-        return np.real((n*eps + epsD*(n+1))*djkp + epsD*n*(n+1)*(eps - 1)*j)
+        return np.real((n*eps + epsD*(n+1))*djkp + epsD*n*(n+1)*(eps - epsInf)/epsInf*j)
 
     @staticmethod
-    def __genGuessEps(n, N, r0, epsD):
+    def __genGuessEps(n, N, r0, epsD, epsInf):
         result = np.zeros(N)
         result[0] = -epsD*(n+1.)/n if n != 0 else np.NaN
         if N == 1:
             return result
         vals = np.array(jn_zeros(n+1, N-1))
-        result[1:] = FreqFinder.__epsFromKp(vals, r0)
+        result[1:] = FreqFinder.__epsFromKp(vals, r0, epsInf)
         return result
 
-    def __init__(self, r0, nu, epsD, xtol=1e-9):
+    def __init__(self, r0, nu, epsD, epsInf=1., xtol=1e-9):
         """
             r0 -- charectiristic length of nonlocatity divided by the radius of the particle
             nu -- ratio of effective collision frequency and plasma frequency
@@ -60,10 +60,11 @@ class FreqFinder:
         self.__r0 = r0
         self.__nu = nu
         self.__epsD = epsD
+        self.__epsInf = epsInf
         self.__xtol = xtol if xtol < 1e-9 else 1e-9
 
     def zeroFunc(self, n, eps):
-        return FreqFinder.__zeroFunction(n, eps, self.__r0, self.__epsD)
+        return FreqFinder.__zeroFunction(n, eps, self.__r0, self.__epsD, self.__epsInf)
 
     @cache
     def getResocnancePermittivities(self, n, Nz):
@@ -77,7 +78,8 @@ class FreqFinder:
             return np.array([], dtype=np.complex64)
 
         # Nz + 1 is need for np.isclose(spRootResult.root, 0) case
-        guesses = FreqFinder.__genGuessEps(n, Nz+1, self.__r0, self.__epsD)
+        guesses = FreqFinder.__genGuessEps(
+            n, Nz+1, self.__r0, self.__epsD, self.__epsInf)
 
         if n == 0:
             return guesses[:-1]
@@ -126,7 +128,7 @@ class FreqFinder:
             subsequent ones correspond to the volume plasmons.
         """
         resEps = self.getResocnancePermittivities(n, Nz)
-        return FreqFinder.__wFromEps(resEps, self.__nu)
+        return FreqFinder.__wFromEps(resEps, self.__nu, self.__epsInf)
 
     # def optFunc(self,  n, eps) :
     #     return FreqFinder.__abs2(self.zeroFunc(n, eps))
@@ -135,17 +137,18 @@ class FreqFinder:
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     nu = 0.1
-    r0 = .01
+    r0 = .03
 
     ss.jn_zeros
     epsD = 1
-    ff = FreqFinder(r0, nu, epsD)
-    n = 21
-    eps = np.linspace(-2, 1, 100000)
-    Nz = 50
+    epsInf = 10
 
+    ff = FreqFinder(r0, nu, epsD, epsInf)
+    n = 1
+    eps = np.linspace(-2, epsInf, 100000)
+    Nz = 50
     zf = ff.zeroFunc(n, eps)
-    zeros0 = FreqFinder._FreqFinder__genGuessEps(n, Nz, r0, epsD)
+    zeros0 = FreqFinder._FreqFinder__genGuessEps(n, Nz, r0, epsD, epsInf)
     zeros = ff.getResocnancePermittivities(n, Nz)
     print(ff.getResocnanceFrequencies(n, Nz))
     # def F(eps): return ff.optFunc(n, eps)
