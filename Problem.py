@@ -6,6 +6,7 @@ from Integrals import Coefficients
 
 class Problem:
     """
+    @TODO
     Class for solving system of equations, determining\n
     the forced oscillations of the plasma sphere of unit radius.\n
     These equations are of form\n
@@ -48,9 +49,13 @@ class Problem:
 
     __Cv: np.ndarray
 
-    __rhsArr: np.ndarray
+    __rhoextArr: np.ndarray
 
-    __rhsFunc: Callable[[np.ndarray, np.double], np.ndarray]
+    __rhoextFunc: Callable[[np.ndarray, np.double], np.ndarray]
+
+    __phiextArr: np.ndarray
+
+    __phiextFunc: Callable[[np.ndarray, np.double], np.ndarray]
 
     __Q0: np.double
 
@@ -66,38 +71,75 @@ class Problem:
         self.__solved = False
 
         self.__kpaSq = (
-            self.__freq * (self.__freq + 1j * self.__nu) - 1
+            self.__freq * (self.__freq + 1j * self.__nu) - 1./self.__epsInf
         ) / self.__r0**2
 
         self.__solver.A = self.__Ac + self.__Av * self.__kpaSq
         self.__solver.B = self.__Bc + self.__Bv * self.__kpaSq
         self.__solver.C = self.__Cc - self.__Cv * self.__kpaSq
 
-        self.__rhsArr = self.__rhsFunc(self.__r, self.__freq)
+        self.__rhoextArr = self.__rhoextFunc(self.__r, self.__freq)
+        self.__phiextArr = self.__phiextFunc(self.__r, self.__freq)
 
         self.__solver.F = np.zeros((self.__coef.N, self.__DIM), dtype=complex)
 
         self.__solver.F[1:-1, 0] = (
-            -self.__coef.alpha1[1:-1] * self.__rhsArr[0:-2]
-            - self.__coef.gamma1[1:-1] * self.__rhsArr[1:-1]
-            - self.__coef.beta1[1:-1] * self.__rhsArr[2:]
+            self.__coef.alpha1[1:-1] * self.__rhoextArr[0:-2]
+            + self.__coef.gamma1[1:-1] * self.__rhoextArr[1:-1]
+            + self.__coef.beta1[1:-1] * self.__rhoextArr[2:]
         )
+
+        self.__solver.F[1:-1, 0] += (
+            + self.__coef.alpha2[1:-1] * self.__phiextArr[0:-2]
+            - self.__coef.gamma2[1:-1] * self.__phiextArr[1:-1]
+            + self.__coef.beta2[1:-1] * self.__phiextArr[2:]
+        ) / 4. / np.pi
+
+        self.__solver.F[1:-1, 0] += (
+            - self.__coef.alpha0[1:-1] * self.__phiextArr[0:-2]
+            - self.__coef.gamma0[1:-1] * self.__phiextArr[1:-1]
+            - self.__coef.beta0[1:-1] * self.__phiextArr[2:]
+        ) / 4. / np.pi * self.__multipoleNo * (self.__multipoleNo + 1)
+
         self.__solver.F[0, 0] = (
-            -self.__coef.gamma1[0] * self.__rhsArr[0]
-            - self.__coef.beta1[0] * self.__rhsArr[1]
+            self.__coef.gamma1[0] * self.__rhoextArr[0]
+            + self.__coef.beta1[0] * self.__rhoextArr[1]
         )
+
+        self.__solver.F[0, 0] += (
+            - self.__coef.gamma2[0] * self.__phiextArr[0]
+            + self.__coef.beta2[0] * self.__phiextArr[1]
+        ) / 4. / np.pi
+
+        self.__solver.F[0, 0] += (
+            - self.__coef.gamma0[0] * self.__phiextArr[0]
+            - self.__coef.beta0[0] * self.__phiextArr[1]
+        ) / 4. / np.pi * self.__multipoleNo * (self.__multipoleNo + 1)
+
         self.__solver.F[-1, 0] = (
-            -self.__coef.gamma1[-1] * self.__rhsArr[-1]
-            - self.__coef.alpha1[-1] * self.__rhsArr[-2]
+            self.__coef.gamma1[-1] * self.__rhoextArr[-1]
+            + self.__coef.alpha1[-1] * self.__rhoextArr[-2]
         )
+
+        self.__solver.F[-1, 0] += (
+            + self.__coef.alpha2[-1] * self.__phiextArr[-2]
+            - self.__coef.gamma2[-1] * self.__phiextArr[-1]
+        ) / 4. / np.pi
+
+        self.__solver.F[-1, 0] += (
+            - self.__coef.alpha0[-1] * self.__phiextArr[-2]
+            - self.__coef.gamma0[-1] * self.__phiextArr[-1]
+        ) / 4. / np.pi * self.__multipoleNo * (self.__multipoleNo + 1)
 
         self.__solver.F[-1, 0] -= (
             self.__Q0
-            * self.__epsD
+            * self.__epsD/self.__epsInf
             * (2 * self.__multipoleNo + 1)
             / (4 * np.pi * self.__r0**2)
         )
-        self.__solver.F[-1, 1] += self.__Q0 * self.__epsD * (2 * self.__multipoleNo + 1)
+
+        self.__solver.F[-1, 1] += self.__Q0 * \
+            self.__epsD/self.__epsInf * (2 * self.__multipoleNo + 1)
 
     def __zeroRHS(self, r: np.ndarray, w: np.double) -> np.ndarray:
         return np.zeros(self.__coef.N)
@@ -109,8 +151,10 @@ class Problem:
         nu: np.double,
         w: np.double,
         r0: np.double,
-        epsD: np.double,
-        rhs: Callable[[np.ndarray, np.double], np.ndarray] = None,
+        epsD: np.double = 1.,
+        epsInf: np.double = 1.,
+        rhsrho: Callable[[np.ndarray, np.double], np.ndarray] = None,
+        rhsphi: Callable[[np.ndarray, np.double], np.ndarray] = None,
         Q0: np.double = 0,
     ) -> None:
         """
@@ -120,7 +164,7 @@ class Problem:
         w    - Frequency [wp]\n
         r0   - V0 / SphereRadius / wp  , \n
         epsD - Permittivity of external media (ε₀)\n
-        rhs  - Rright hand side (source in the equation for rho). Function of r and freq\n
+       @TODO rhs  - Rright hand side (source in the equation for rho). Function of r and freq\n
         Q0   - The coefficient before the component of the potential outside the sphere,\n
                which increases with increasing radius (φₑₓₜ ~ Q₀ rᵐ + C / rᵐ⁺¹)\n
         """
@@ -130,11 +174,13 @@ class Problem:
 
         self.__multipoleNo = m
         self.__epsD = epsD
+        self.__epsInf = epsInf
         self.__nu = nu
         self.__freq = w
         self.__r0 = r0
 
-        self.__rhsFunc = rhs if rhs is not None else self.__zeroRHS
+        self.__rhoextFunc = rhsrho if rhsrho is not None else self.__zeroRHS
+        self.__phiextFunc = rhsphi if rhsphi is not None else self.__zeroRHS
         self.__Q0 = Q0
 
         self.__Ac = np.zeros((N, self.__DIM, self.__DIM), dtype=complex)
@@ -144,21 +190,25 @@ class Problem:
         self.__Bv = np.zeros_like(self.__Ac, dtype=complex)
         self.__Cv = np.zeros_like(self.__Ac, dtype=complex)
 
-        self.__Ac[:, 0, 0] = self.__coef.alpha2 - m * (m + 1) * self.__coef.alpha0
+        self.__Ac[:, 0, 0] = self.__coef.alpha2 - \
+            m * (m + 1) * self.__coef.alpha0
         self.__Ac[:, 1, 1] = self.__Ac[:, 0, 0]
-        self.__Ac[:, 1, 0] = 4 * np.pi * self.__coef.alpha1
+        self.__Ac[:, 1, 0] = 4 * np.pi / epsInf * self.__coef.alpha1
         self.__Av[:, 0, 0] = self.__coef.alpha1
 
-        self.__Bc[:, 0, 0] = self.__coef.beta2 - m * (m + 1) * self.__coef.beta0
+        self.__Bc[:, 0, 0] = self.__coef.beta2 - \
+            m * (m + 1) * self.__coef.beta0
         self.__Bc[:, 1, 1] = self.__Bc[:, 0, 0]
-        self.__Bc[:, 1, 0] = 4 * np.pi * self.__coef.beta1
+        self.__Bc[:, 1, 0] = 4 * np.pi / epsInf * self.__coef.beta1
         self.__Bv[:, 0, 0] = self.__coef.beta1
 
-        self.__Cc[:, 0, 0] = self.__coef.gamma2 + m * (m + 1) * self.__coef.gamma0
+        self.__Cc[:, 0, 0] = self.__coef.gamma2 + \
+            m * (m + 1) * self.__coef.gamma0
         self.__Cc[:, 1, 1] = self.__Cc[:, 0, 0]
-        self.__Cc[:, 1, 0] = -4 * np.pi * self.__coef.gamma1
-        self.__Cc[-1, 0, 1] -= 1.0 / (4 * np.pi * r0 * r0) * epsD * (m + 1)
-        self.__Cc[-1, 1, 1] += epsD * (m + 1)
+        self.__Cc[:, 1, 0] = -4 * np.pi / epsInf * self.__coef.gamma1
+        self.__Cc[-1, 0, 1] -= 1.0 / \
+            (4 * np.pi * r0 * r0) * epsD/epsInf * (m + 1)
+        self.__Cc[-1, 1, 1] += epsD/epsInf * (m + 1)
         self.__Cv[:, 0, 0] = self.__coef.gamma1
 
         self._updateFreq()

@@ -7,25 +7,26 @@ from scipy.special import spherical_jn
 
 
 def rhs(r, w):
-    return G(k0, r)
+    return -G(k0, r)
 
 
 multipoleIndex = 1
 N = 1001
 epsD = 1
 r0 = 0.1
-nu = 5
+nu = 1
 w = 1.5
-k0 = 1
+k0 = 14
 
 
 def G(k, r):
     return (
-        spherical_jn(multipoleIndex, k * r) / k / spherical_jn(multipoleIndex, k, True)
+        spherical_jn(multipoleIndex, k * r) / k /
+        spherical_jn(multipoleIndex, k, True)
     )
 
 
-p: Problem = Problem(N, multipoleIndex, nu, w, r0, epsD, rhs=rhs)
+p: Problem = Problem(N, multipoleIndex, nu, w, r0, epsD, rhsrho=rhs)
 
 phi = p.getPhi()
 rho = p.getRho()
