@@ -1,5 +1,6 @@
 from typing import Callable
 import numpy as np
+from ClusterParameters import ClusterParameters
 from TDMAsolver import TDMAsolver as Solver
 from Integrals import Coefficients
 
@@ -146,13 +147,10 @@ class Problem:
 
     def __init__(
         self,
+        parameters: ClusterParameters,
         N: int,
         m: int,
-        nu: np.double,
         w: np.double,
-        r0: np.double,
-        epsD: np.double = 1.,
-        epsInf: np.double = 1.,
         rhsrho: Callable[[np.ndarray, np.double], np.ndarray] = None,
         rhsphi: Callable[[np.ndarray, np.double], np.ndarray] = None,
         Q0: np.double = 0,
@@ -173,15 +171,19 @@ class Problem:
         self.__r = np.linspace(0, 1, N)
 
         self.__multipoleNo = m
-        self.__epsD = epsD
-        self.__epsInf = epsInf
-        self.__nu = nu
+        self.__epsD = parameters.epsD
+        self.__epsInf = parameters.epsInf
+        self.__nu = parameters.nu
         self.__freq = w
-        self.__r0 = r0
+        self.__r0 = parameters.r0
 
         self.__rhoextFunc = rhsrho if rhsrho is not None else self.__zeroRHS
         self.__phiextFunc = rhsphi if rhsphi is not None else self.__zeroRHS
         self.__Q0 = Q0
+
+        epsInf = parameters.epsInf
+        epsD = parameters.epsD
+        r0 = parameters.r0
 
         self.__Ac = np.zeros((N, self.__DIM, self.__DIM), dtype=complex)
         self.__Bc = np.zeros_like(self.__Ac, dtype=complex)

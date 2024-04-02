@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Integrals import Coefficients
 from Problem import Problem
+from ClusterParameters import ClusterParameters
+
 
 from scipy.special import spherical_jn
 
@@ -26,7 +28,9 @@ def G(k, r):
     )
 
 
-p: Problem = Problem(N, multipoleIndex, nu, w, r0, epsD, rhsrho=rhs)
+param = ClusterParameters(nu, r0, epsD)
+
+p: Problem = Problem(param, N, multipoleIndex, w, rhsrho=rhs)
 
 phi = p.getPhi()
 rho = p.getRho()

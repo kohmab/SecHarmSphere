@@ -1,11 +1,13 @@
 import numpy as np
 from scipy.special import spherical_jn, jve
+from ClusterParameters import ClusterParameters
 from Oscillation import Oscillation
 
 
 class DipoleOscillation(Oscillation):
-    def __init__(self, N: int, nu, r0, epsD=1, epsInf=1):
-        super().__init__(N, 1, nu, r0, epsD, epsInf)
+
+    def __init__(self, N: int, parameters: ClusterParameters):
+        super().__init__(N, 1, parameters)
 
     def __radFunc(self):
         return spherical_jn(1, self.__kp*self.r)/self.__kp/spherical_jn(1, self.__kp, True)

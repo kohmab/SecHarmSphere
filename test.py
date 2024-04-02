@@ -1,6 +1,7 @@
 from scipy.special import spherical_jn
 import matplotlib.pyplot as plt
 import numpy as np
+from ClusterParameters import ClusterParameters
 from Problem import Problem
 
 
@@ -11,11 +12,13 @@ def rhs(r, w):
 multipoleIndex = 1
 N = 501
 epsD = 1
-r0 = 0.01
+r0 = 0.1
 nu = 0.1
-w = 0.4
+w = 1.4
 
-p: Problem = Problem(N, multipoleIndex, nu, w, r0, epsD, Q0=-1)
+param = ClusterParameters(nu, r0, epsD)
+
+p: Problem = Problem(param, N, multipoleIndex, w, Q0=-1)
 
 phi = p.getPhi()
 rho = p.getRho()
