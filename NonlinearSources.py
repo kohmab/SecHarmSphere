@@ -106,7 +106,7 @@ class NonlinearSources():
         val = self.beta*self.C(w)**2 / (4.*np.pi*r0**2) * \
             (2.j*w-nu) / 2. / (1.j*w-nu) * \
             eps / epsInf
-        return val * (self._f1(r, kp) - self._f2(r, kp)*(1-self._f2(r, kp)))
+        return val * (self._f1(r, kp) + self._f2(r, kp)*(1-self._f2(r, kp)))
 
     @_memoize
     def _sinSqPartRho(self, r, w):
@@ -118,7 +118,7 @@ class NonlinearSources():
         val = self.beta*self.C(w)**2 / (4.*np.pi*r0**2) * \
             (2.j*w-nu) / 2. / (1.j*w-nu) * \
             eps / epsInf
-        return - val * self._f3(r, kp)*(1-self._f3(r, kp))
+        return + val * self._f3(r, kp)*(1-self._f3(r, kp))
 
     def _rhoExtQuad(self, r, wDoubled):
         w = wDoubled / 2
@@ -138,11 +138,4 @@ class NonlinearSources():
 
 
 if __name__ == "__main__":
-    params = ClusterParameters(0.1, 0.1, 1, 1)
-    ns = NonlinearSources(params, 0.1)
-    r = np.linspace(0, 1, 10)
-    ns.test(0.1, r)
-    ns.test(0.1, r)
-    r = np.linspace(0, 1, 100)
-    ns.test(0.1, r)
-    ns.test(0.1, r)
+    pass
