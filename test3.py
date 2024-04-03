@@ -1,4 +1,5 @@
 from ClusterParameters import ClusterParameters
+from DipoleOscillation import DipoleOscillation
 from NonlinearSources import NonlinearSources
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,7 +19,9 @@ if __name__ == "__main__":
     ns = NonlinearSources(params, beta)
 
     p = Problem(
-        params, N, 0, w, rhsphi=ns.phiFunctions[0])
+        params, N, 0, w, rhsrho=ns.rhoFunctions[0], rhsphi=ns.phiFunctions[0])
+
+    dip = DipoleOscillation(N, params)
 
     rho = p.getRho()
     phi = p.getPhi()
@@ -34,6 +37,22 @@ if __name__ == "__main__":
     plt.title(r'$\varphi$')
     plt.plot(r, phi.real, 'r')
     plt.plot(r, phi.imag, 'b')
+    plt.grid()
+
+    plt.figure(3)
+    plt.title(r'func')
+    kp = ns._kp(w)
+    fun = ns.rhoFunctions[0](r, w)
+    plt.plot(r, fun.real, 'r')
+    plt.plot(r, fun.imag, 'b')
+    plt.grid()
+
+    plt.figure(4)
+    plt.title(r'dip')
+    kp = ns._kp(w)
+    fun = dip.getPsi(w)
+    plt.plot(r, fun.real, 'r')
+    plt.plot(r, fun.imag, 'b')
     plt.grid()
 
     plt.show()

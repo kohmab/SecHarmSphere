@@ -85,7 +85,7 @@ class NonlinearSources():
         nu = self.parameters.nu
         return self.beta*self.C(w)**2/4 * (
             eps/epsInf/w/(w+1.j*nu) * self._f1(r, kp) -
-            1/(w+1.j*nu)**2*self._f2(r, kp)
+            1/(w+1.j*nu)**2*(1-self._f2(r, kp))**2
         )
 
     @_memoize
@@ -94,7 +94,7 @@ class NonlinearSources():
         eps = self._eps(w)
         epsInf = self.parameters.epsInf
         nu = self.parameters.nu
-        return -self.beta*self.C(w)**2/4 * (self._f2(r, kp)/(w+1.j*nu)**2)
+        return -self.beta*self.C(w)**2/4 * (1-self._f3(r, kp))**2/(w+1.j*nu)**2
 
     @_memoize
     def _cosSqPartRho(self, r, w):
@@ -104,7 +104,7 @@ class NonlinearSources():
         nu = self.parameters.nu
         r0 = self.parameters.r0
         val = self.beta*self.C(w)**2 / (4.*np.pi*r0**2) * \
-            (2.j*w+nu) / 2. / (1.j*w+nu) * \
+            (2.j*w-nu) / 2. / (1.j*w-nu) * \
             eps / epsInf
         return val * (self._f1(r, kp) - self._f2(r, kp)*(1-self._f2(r, kp)))
 
@@ -116,23 +116,23 @@ class NonlinearSources():
         nu = self.parameters.nu
         r0 = self.parameters.r0
         val = self.beta*self.C(w)**2 / (4.*np.pi*r0**2) * \
-            (2.j*w+nu) / 2. / (1.j*w+nu) * \
+            (2.j*w-nu) / 2. / (1.j*w-nu) * \
             eps / epsInf
         return - val * self._f3(r, kp)*(1-self._f3(r, kp))
 
-    def _rhoExtMono(self, r, wDoubled):
+    def _rhoExtQuad(self, r, wDoubled):
         w = wDoubled / 2
         return (self._cosSqPartRho(r, w)-self._sinSqPartRho(r, w))*2./3.
 
-    def _phiExtMono(self, r, wDoubled):
+    def _phiExtQuad(self, r, wDoubled):
         w = wDoubled / 2
         return (self._cosSqPartPhi(r, w)-self._sinSqPartPhi(r, w))*2./3.
 
-    def _rhoExtQuad(self, r, wDoubled):
+    def _rhoExtMono(self, r, wDoubled):
         w = wDoubled / 2
         return (self._cosSqPartRho(r, w)+2*self._sinSqPartRho(r, w))/3.
 
-    def _phiExtQuad(self, r, wDoubled):
+    def _phiExtMono(self, r, wDoubled):
         w = wDoubled / 2
         return (self._cosSqPartPhi(r, w)+2*self._sinSqPartPhi(r, w))/3.
 
