@@ -5,6 +5,14 @@ from scipy.special import spherical_jn
 
 
 class NonlinearSources():
+    __instances = {}
+
+    def __new__(cls, *args, **kwargs):
+        if args in cls.__instances.keys():
+            return cls.__instances[args]
+        instance = super().__new__(cls)
+        cls.__instances[args] = instance
+        return instance
 
     def __init__(self, parameters: ClusterParameters, beta=0.) -> None:
         self._parameters = parameters
