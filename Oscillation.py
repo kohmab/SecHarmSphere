@@ -22,19 +22,19 @@ class Oscillation(ABC):
         self.__w = None
 
     @abstractclassmethod
-    def getPhi(self, w):
+    def getPhi(self, w) -> np.ndarray:
         pass
 
     @abstractclassmethod
-    def getRho(self, w):
+    def getRho(self, w) -> np.ndarray:
         pass
 
     @abstractclassmethod
-    def getPsi(self, w):
+    def getPsi(self, w) -> np.ndarray:
         pass
 
     @property
-    def r(self):
+    def r(self) -> np.ndarray:
         return self.__r
 
     @property

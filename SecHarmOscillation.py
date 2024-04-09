@@ -16,35 +16,36 @@ class SecHarmOscillation(Oscillation):
             parameters, N, m, 1000, self.__ns.rhoFunctions[m], self.__ns.phiFunctions[m])
 
     def getPhi(self, w):
-        self.__problem.setFreq(w)
-        self.freq = w
+        self.__problem.setFreq(2*w)
+        self.freq = 2*w
         phi = self.__problem.getPhi()
         return phi
 
     def getRho(self, w):
-        self.__problem.setFreq(w)
-        self.freq = w
+        self.__problem.setFreq(2*w)
+        self.freq = 2*w
         rho = self.__problem.getRho()
         return rho
 
     def getPsi(self, w):
         rho = self.getRho(w)
         phi = self.getPhi(w)
-        phiExt = self.__ns.phiFunctions[self.multipoleN0](self.r, w)
+        phiExt = self.__ns.phiFunctions[self.multipoleN0](self.r, self.freq)
         return phi + (phiExt + 4*pi*rho)*self.r0**2
 
 
 if __name__ == "__main__":
-    params = ClusterParameters(0.1, 0.05, 1, 1)
-    N = 1001
-    beta = 0.01
-    osc = SecHarmOscillation(N, 0, params, beta)
-    psi = osc.getPsi(1.5)
-    import matplotlib.pyplot as plt
+    pass
+    # params = ClusterParameters(0.1, 0.05, 1, 1)
+    # N = 1001
+    # beta = 0.01
+    # osc = SecHarmOscillation(N, 0, params, beta)
+    # psi = osc.getPsi(1.5)
+    # import matplotlib.pyplot as plt
 
-    plt.figure(1)
+    # plt.figure(1)
 
-    plt.plot(osc.r, psi.real, 'r')
-    plt.plot(osc.r, psi.imag, 'b')
-    plt.grid()
-    plt.show()
+    # plt.plot(osc.r, psi.real, 'r')
+    # plt.plot(osc.r, psi.imag, 'b')
+    # plt.grid()
+    # plt.show()
