@@ -1,3 +1,4 @@
+import enum
 from typing import List
 from ClusterParameters import ClusterParameters
 from DipoleOscillation import DipoleOscillation
@@ -31,16 +32,16 @@ def getLosses(osc: Oscillation, w: np.ndarray) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    nu = 0.05
-    r0 = 0.1
-    epsD = 1.
+    nu = 0.012
+    r0 = 0.078
+    epsD = 3./2.
     epsInf = 1.
-    beta = 0.05
-    N = 2001
+    beta = 1.2
+    N = 401
 
-    wmin = 0.2
-    wmax = 2
-    Nw = 1000
+    wmin = 0.3
+    wmax = 1
+    Nw = 1500
     w = np.linspace(wmin, wmax, Nw)
 
     params = ClusterParameters(nu, r0, epsD, epsInf)
@@ -52,8 +53,9 @@ if __name__ == "__main__":
     for osc in oscillations:
         losses.append(getLosses(osc, w))
 
+    colors = ["g", "r", "b"]
     plt.figure(1)
-    for l in losses:
-        plt.plot(w, l)
+    for i, l in enumerate(losses):
+        plt.plot(w, l, colors[i])
     plt.grid()
     plt.show()
