@@ -13,7 +13,7 @@ class SecHarmOscillation(Oscillation):
         super().__init__(N, m, parameters)
         self.__ns = NonlinearSources(parameters, beta)
         self.__problem = Problem(
-            parameters, N, m, 1000, self.__ns.rhoFunctions[m], self.__ns.phiFunctions[m])
+            parameters, N, m, None, self.__ns.rhoFunctions[m], self.__ns.phiFunctions[m])
 
     def getPhi(self, w):
         self.__problem.setFreq(2*w)
