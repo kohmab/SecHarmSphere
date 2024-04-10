@@ -213,7 +213,7 @@ class Problem:
         self.__Cc[-1, 1, 1] += epsD/epsInf * (m + 1)
         self.__Cv[:, 0, 0] = self.__coef.gamma1
 
-        self._updateFreq()
+        self.__solved = False
 
     def setFreq(self, w: np.double) -> None:
         """
@@ -227,6 +227,7 @@ class Problem:
     def _solve(self) -> None:
         if self.__solved:
             return
+        self._updateFreq()
         self.__solver.solve()
         self.__solved = True
 
