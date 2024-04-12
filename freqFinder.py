@@ -5,6 +5,8 @@ import numba
 from functools import cache
 from sympy.functions.special.bessel import jn_zeros
 
+from ClusterParameters import ClusterParameters
+
 
 class FreqFinder:
     """
@@ -48,7 +50,7 @@ class FreqFinder:
         result[1:] = FreqFinder.__epsFromKp(vals, r0, epsInf)
         return result
 
-    def __init__(self, r0, nu, epsD, epsInf=1., xtol=1e-9):
+    def __init__(self, parameters: ClusterParameters, xtol=1e-9):
         """
             r0 -- charectiristic length of nonlocatity divided by the radius of the particle
             nu -- ratio of effective collision frequency and plasma frequency
@@ -57,10 +59,10 @@ class FreqFinder:
 
         if r0 > 1:
             raise Exception("Fermi radius is too big")
-        self.__r0 = r0
-        self.__nu = nu
-        self.__epsD = epsD
-        self.__epsInf = epsInf
+        self.__r0 = parameters.r0
+        self.__nu = parameters.nu
+        self.__epsD = parameters.epsD
+        self.__epsInf = parameters.epsInf
         self.__xtol = xtol if xtol < 1e-9 else 1e-9
 
     def zeroFunc(self, n, eps):
