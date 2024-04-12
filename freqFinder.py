@@ -57,7 +57,7 @@ class FreqFinder:
             epsD -- permitivity of the surrounding media
         """
 
-        if r0 > 1:
+        if parameters.r0 > 1:
             raise Exception("Fermi radius is too big")
         self.__r0 = parameters.r0
         self.__nu = parameters.nu
