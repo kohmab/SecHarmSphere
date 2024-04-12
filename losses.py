@@ -36,21 +36,21 @@ def getLosses(osc: Oscillation, w: np.ndarray) -> np.ndarray:
 def generateFilename(*args) -> str:
     res = 0
     for arg in args:
-        res += res*31 + hash(args)
+        res += res*31 + hash(arg)
     return hex(res)
 
 
 if __name__ == "__main__":
-    nu = 0.001
+    nu = 0.01
     r0 = 0.05
-    epsD = 3.
+    epsD = 3
     epsInf = 2
     beta = 1.2
-    N = 1001
+    N = 751
 
-    wmin = 0.3
+    wmin = 0.1
     wmax = 0.45
-    Nw = 6000
+    Nw = 1000
     w = np.linspace(wmin, wmax, Nw)
 
     params = ClusterParameters(nu, r0, epsD, epsInf)
@@ -83,5 +83,6 @@ if __name__ == "__main__":
             resFreq /= 2.
         plt.scatter(resFreq, np.zeros(10), c=colors[i], marker="x")
     plt.plot(w, sum(losses), 'y')
+    plt.xlim((wmin, wmax))
     plt.grid()
     plt.show()
