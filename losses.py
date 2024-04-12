@@ -1,4 +1,3 @@
-import enum
 from typing import List
 from ClusterParameters import ClusterParameters
 from DipoleOscillation import DipoleOscillation
@@ -10,6 +9,7 @@ import os.path
 import pickle
 
 from SecHarmOscillation import SecHarmOscillation
+from freqFinder import FreqFinder
 
 
 def getLossesAtOneFreq(osc: Oscillation, w: float):
@@ -36,21 +36,21 @@ def getLosses(osc: Oscillation, w: np.ndarray) -> np.ndarray:
 def generateFilename(*args) -> str:
     res = 0
     for arg in args:
-        res += hash(args)
+        res += res*31 + hash(args)
     return hex(res)
 
 
 if __name__ == "__main__":
-    nu = 0.012
-    r0 = 0.078
-    epsD = 3./2.
-    epsInf = 1.
+    nu = 0.001
+    r0 = 0.05
+    epsD = 3.
+    epsInf = 2
     beta = 1.2
-    N = 401
+    N = 1001
 
     wmin = 0.3
-    wmax = 1
-    Nw = 1000
+    wmax = 0.45
+    Nw = 6000
     w = np.linspace(wmin, wmax, Nw)
 
     params = ClusterParameters(nu, r0, epsD, epsInf)
@@ -74,8 +74,14 @@ if __name__ == "__main__":
 
     colors = ["g", "r", "b"]
     plt.figure(1)
+    ff = FreqFinder(params)
     for i, l in enumerate(losses):
         plt.plot(w, l, colors[i])
+        resFreq = ff.getResocnanceFrequencies(
+            oscillations[i].multipoleN0, 10).real
+        if isinstance(oscillations[i], SecHarmOscillation):
+            resFreq /= 2.
+        plt.scatter(resFreq, np.zeros(10), c=colors[i], marker="x")
     plt.plot(w, sum(losses), 'y')
     plt.grid()
     plt.show()
