@@ -1,4 +1,4 @@
-from abc import abstractclassmethod
+from abc import abstractmethod
 from abc import ABC
 import re
 import numpy as np
@@ -21,15 +21,15 @@ class Oscillation(ABC):
         self._isFreqChanged = True
         self.__w = None
 
-    @abstractclassmethod
+    @abstractmethod
     def getPhi(self, w) -> np.ndarray:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def getRho(self, w) -> np.ndarray:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def getPsi(self, w) -> np.ndarray:
         pass
 
