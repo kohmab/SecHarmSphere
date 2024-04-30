@@ -84,7 +84,7 @@ class Problem:
 
         self.__solver.F = np.zeros((self.__coef.N, self.__DIM), dtype=complex)
 
-        self.__solver.F[1:-1, 0] = (
+        self.__solver.F[1:-1, 0] = -(
             self.__coef.alpha1[1:-1] * self.__rhoextArr[0:-2]
             + self.__coef.gamma1[1:-1] * self.__rhoextArr[1:-1]
             + self.__coef.beta1[1:-1] * self.__rhoextArr[2:]
@@ -102,7 +102,7 @@ class Problem:
             - self.__coef.beta0[1:-1] * self.__phiextArr[2:]
         ) / 4. / np.pi * self.__multipoleNo * (self.__multipoleNo + 1)
 
-        self.__solver.F[0, 0] = (
+        self.__solver.F[0, 0] = -(
             self.__coef.gamma1[0] * self.__rhoextArr[0]
             + self.__coef.beta1[0] * self.__rhoextArr[1]
         )
@@ -117,7 +117,7 @@ class Problem:
             - self.__coef.beta0[0] * self.__phiextArr[1]
         ) / 4. / np.pi * self.__multipoleNo * (self.__multipoleNo + 1)
 
-        self.__solver.F[-1, 0] = (
+        self.__solver.F[-1, 0] = -(
             self.__coef.gamma1[-1] * self.__rhoextArr[-1]
             + self.__coef.alpha1[-1] * self.__rhoextArr[-2]
         )

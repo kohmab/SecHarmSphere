@@ -41,16 +41,19 @@ def generateFilename(*args) -> str:
 
 
 if __name__ == "__main__":
-    nu = 0.01
-    r0 = 0.05
-    epsD = 3
-    epsInf = 2
-    beta = 1.2
-    N = 751
 
-    wmin = 0.1
-    wmax = 0.45
-    Nw = 1000
+    useCache = False
+
+    nu = 0.01
+    r0 = 0.03
+    epsD = 1.55
+    epsInf = 1
+    beta = 0.05
+    N = 300
+
+    wmin = 0.3
+    wmax = 1.0
+    Nw = 1200
     w = np.linspace(wmin, wmax, Nw)
 
     params = ClusterParameters(nu, r0, epsD, epsInf)
@@ -61,16 +64,16 @@ if __name__ == "__main__":
 
     filename = "./savedResults/" + \
         generateFilename(nu, r0, epsD, epsInf, beta, N, Nw, wmin, wmax)
-    if not os.path.isfile(filename):
+    if os.path.isfile(filename) and useCache:
+        print("Loading saved results...")
+        with open(filename, "rb") as handle:
+            w, losses = pickle.load(handle)
+    else:
         losses: List[np.ndarray] = []
         for osc in oscillations:
             losses.append(getLosses(osc, w))
         with open(filename, "wb") as handle:
             pickle.dump((w, losses), handle)
-    else:
-        print("Loading saved results...")
-        with open(filename, "rb") as handle:
-            w, losses = pickle.load(handle)
 
     colors = ["g", "r", "b"]
     plt.figure(1)
