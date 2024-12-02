@@ -135,6 +135,14 @@ class FreqFinder:
     # def optFunc(self,  n, eps) :
     #     return FreqFinder.__abs2(self.zeroFunc(n, eps))
 
+    @property
+    def epsD(self):
+        return self.__epsD
+
+    @epsD.setter
+    def epsD(self, epsD):
+        self.__epsD = epsD
+
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
