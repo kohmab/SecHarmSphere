@@ -145,30 +145,31 @@ class FreqFinder:
 
 
 if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    nu = 0.1
-    r0 = .03
-
-    ss.jn_zeros
-    epsD = 1
-    epsInf = 10
-
-    ff = FreqFinder(r0, nu, epsD, epsInf)
-    n = 1
-    eps = np.linspace(-2, epsInf, 100000)
-    Nz = 50
-    zf = ff.zeroFunc(n, eps)
-    zeros0 = FreqFinder._FreqFinder__genGuessEps(n, Nz, r0, epsD, epsInf)
-    zeros = ff.getResocnancePermittivities(n, Nz)
-    print(ff.getResocnanceFrequencies(n, Nz))
-    # def F(eps): return ff.optFunc(n, eps)
-    # res = minimize(F, x0=-2)
-    # print(res)
-    fig, ax = plt.subplots()
-    ax.plot(eps, zf, 'r')
-    ax.scatter(zeros0, np.zeros(Nz), c="black")
-    ax.scatter(zeros, np.zeros_like(zeros), c="red")
-    ax.grid()
-    plt.ylim([-1, 1])
-    plt.show()
-    # ax.plot(eps, of, 'k')
+    pass
+    # import matplotlib.pyplot as plt
+    # nu = 0.1
+    # r0 = .03
+    #
+    # ss.jn_zeros
+    # epsD = 1
+    # epsInf = 10
+    #
+    # ff = FreqFinder(r0, nu, epsD, epsInf)
+    # n = 1
+    # eps = np.linspace(-2, epsInf, 100000)
+    # Nz = 50
+    # zf = ff.zeroFunc(n, eps)
+    # zeros0 = FreqFinder._FreqFinder__genGuessEps(n, Nz, r0, epsD, epsInf)
+    # zeros = ff.getResocnancePermittivities(n, Nz)
+    # print(ff.getResocnanceFrequencies(n, Nz))
+    # # def F(eps): return ff.optFunc(n, eps)
+    # # res = minimize(F, x0=-2)
+    # # print(res)
+    # fig, ax = plt.subplots()
+    # ax.plot(eps, zf, 'r')
+    # ax.scatter(zeros0, np.zeros(Nz), c="black")
+    # ax.scatter(zeros, np.zeros_like(zeros), c="red")
+    # ax.grid()
+    # plt.ylim([-1, 1])
+    # plt.show()
+    # # ax.plot(eps, of, 'k')
