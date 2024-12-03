@@ -69,7 +69,7 @@ class FreqFinder:
         return FreqFinder.__zeroFunction(n, eps, self.__r0, self.__epsD, self.__epsInf)
 
     @cache
-    def getResocnancePermittivities(self, n, Nz):
+    def getResonancePermittivities(self, n, Nz):
         """
             Returns the np.dnarray with values of nanoparticle dielectric function
             corresponding to the first Nz resonances of n-th multiplole mode of the nanopartilce.
@@ -122,14 +122,14 @@ class FreqFinder:
             result[i+1] = vpRootResult.root
         return result
 
-    def getResocnanceFrequencies(self, n, Nz):
+    def getResonanceFrequencies(self, n, Nz):
         """
             Returns the np.dnarray with first Nz eigenfrequencies 
             of n-th multiplole mode of the nanopartilce.
             First element in array corresponds to the sufrace plasmon,
             subsequent ones correspond to the volume plasmons.
         """
-        resEps = self.getResocnancePermittivities(n, Nz)
+        resEps = self.getResonancePermittivities(n, Nz)
         return FreqFinder.__wFromEps(resEps, self.__nu, self.__epsInf)
 
     # def optFunc(self,  n, eps) :
