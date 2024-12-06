@@ -14,39 +14,40 @@ class FreqFinder:
         spherical metallic nanoparticle placed 
         in media with permittivity epsD
     """
+
     @staticmethod
     @numba.njit
     def __kp(eps, r0, epsInf):
-        return np.sqrt(eps/(epsInf-eps)/epsInf + 0j)/r0
+        return np.sqrt(eps / (epsInf - eps) / epsInf + 0j) / r0
 
     @staticmethod
     @numba.njit
     def __eps(w, nu, epsInf):
-        return epsInf - 1./w/(w - 1j*nu)
+        return epsInf - 1. / w / (w - 1j * nu)
 
     @staticmethod
     def __wFromEps(eps, nu, epsInf):
-        return np.sqrt(1./(epsInf-eps)-nu**2/4 + 0j) + 0.5j*nu
+        return np.sqrt(1. / (epsInf - eps) - nu ** 2 / 4 + 0j) + 0.5j * nu
 
     @staticmethod
     def __epsFromKp(kp, r0, epsInf):
-        x = np.square(kp*r0)*epsInf
-        return x/(1+x)*epsInf
+        x = np.square(kp * r0) * epsInf
+        return x / (1 + x) * epsInf
 
     @staticmethod
     def __zeroFunction(n, eps, r0, epsD, epsInf):
         kp = FreqFinder.__kp(eps, r0, epsInf)
         j = ss.jve(n + 0.5, kp)
-        djkp = n*j - ss.jve(n + 1.5, kp)*kp
-        return np.real((n*eps + epsD*(n+1))*djkp + epsD*n*(n+1)*(eps - epsInf)/epsInf*j)
+        djkp = n * j - ss.jve(n + 1.5, kp) * kp
+        return np.real((n * eps + epsD * (n + 1)) * djkp + epsD * n * (n + 1) * (eps - epsInf) / epsInf * j)
 
     @staticmethod
     def __genGuessEps(n, N, r0, epsD, epsInf):
         result = np.zeros(N)
-        result[0] = -epsD*(n+1.)/n if n != 0 else np.NaN
+        result[0] = -epsD * (n + 1.) / n if n != 0 else np.NaN
         if N == 1:
             return result
-        vals = np.array(jn_zeros(n+1, N-1))
+        vals = np.array(jn_zeros(n + 1, N - 1))
         result[1:] = FreqFinder.__epsFromKp(vals, r0, epsInf)
         return result
 
@@ -69,7 +70,7 @@ class FreqFinder:
         return FreqFinder.__zeroFunction(n, eps, self.__r0, self.__epsD, self.__epsInf)
 
     @cache
-    def getResonancePermittivities(self, n, Nz):
+    def getResonancePermittivities(self, n, Nz, epsD):
         """
             Returns the np.dnarray with values of nanoparticle dielectric function
             corresponding to the first Nz resonances of n-th multiplole mode of the nanopartilce.
@@ -81,7 +82,7 @@ class FreqFinder:
 
         # Nz + 1 is need for np.isclose(spRootResult.root, 0) case
         guesses = FreqFinder.__genGuessEps(
-            n, Nz+1, self.__r0, self.__epsD, self.__epsInf)
+            n, Nz + 1, self.__r0, self.__epsD, self.__epsInf)
 
         if n == 0:
             return guesses[:-1]
@@ -104,7 +105,7 @@ class FreqFinder:
         if np.isclose(spRootResult.root, 0):
             spEpsInterval = np.linspace(0, guesses[1], 1000)
             zeroFuncValues = F(spEpsInterval)
-            passThroughZero = zeroFuncValues[:-1]*zeroFuncValues[1:] < 0
+            passThroughZero = zeroFuncValues[:-1] * zeroFuncValues[1:] < 0
             spGuess = spEpsInterval[np.where(passThroughZero)]
             spRootResult = so.root_scalar(F, x0=spGuess, xtol=self.__xtol)
             if not spRootResult.converged:
@@ -117,9 +118,9 @@ class FreqFinder:
             vpRootResult = so.root_scalar(F, x0=vpGuess, xtol=self.__xtol)
             if not vpRootResult.converged:
                 raise Exception(
-                    f"""Can not calculate resonance permittivity for volume plasmon with No. {i+1}""")
+                    f"""Can not calculate resonance permittivity for volume plasmon with No. {i + 1}""")
 
-            result[i+1] = vpRootResult.root
+            result[i + 1] = vpRootResult.root
         return result
 
     def getResonanceFrequencies(self, n, Nz):
@@ -129,7 +130,7 @@ class FreqFinder:
             First element in array corresponds to the sufrace plasmon,
             subsequent ones correspond to the volume plasmons.
         """
-        resEps = self.getResonancePermittivities(n, Nz)
+        resEps = self.getResonancePermittivities(n, Nz, self.epsD)
         return FreqFinder.__wFromEps(resEps, self.__nu, self.__epsInf)
 
     # def optFunc(self,  n, eps) :

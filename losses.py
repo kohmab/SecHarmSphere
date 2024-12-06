@@ -42,28 +42,35 @@ def generateFilename(*args) -> str:
 
 if __name__ == "__main__":
 
-    useCache = False
+    useCache = True
 
-    nu = 0.01
-    r0 = 0.03
-    epsD = 1.55
-    epsInf = 1
-    beta = 0.05
+    wp = 9 / 6.6e-16
+    nu = 0.02
+    Vf = 2.0e8
+    V0 = np.sqrt(3 / 5) * Vf
+    r0 = V0 / wp
+    epsInf = 3
+    a = 5e-7
+    alpha = r0 / a
+
+    epsD = 5.4
+    beta = .1
     N = 300
 
-    wmin = 0.3
-    wmax = 1.0
+    wmin = 0.2
+    wmax = 0.6
     Nw = 1200
     w = np.linspace(wmin, wmax, Nw)
 
-    params = ClusterParameters(nu, r0, epsD, epsInf)
+    params = ClusterParameters(nu, alpha, epsD, epsInf)
+    params_dip = ClusterParameters(nu + 3/4*alpha, alpha, epsD, epsInf)
     oscillations: List[Oscillation] = []
     oscillations.append(SecHarmOscillation(N, 0, params, beta))
-    oscillations.append(DipoleOscillation(N, params))
+    oscillations.append(DipoleOscillation(N, params_dip))
     oscillations.append(SecHarmOscillation(N, 2, params, beta))
 
     filename = "./savedResults/" + \
-        generateFilename(nu, r0, epsD, epsInf, beta, N, Nw, wmin, wmax)
+        generateFilename(nu, alpha, epsD, epsInf, beta, N, Nw, wmin, wmax)
     if os.path.isfile(filename) and useCache:
         print("Loading saved results...")
         with open(filename, "rb") as handle:
@@ -75,12 +82,12 @@ if __name__ == "__main__":
         with open(filename, "wb") as handle:
             pickle.dump((w, losses), handle)
 
-    colors = ["g", "r", "b"]
-    plt.figure(1)
+    colors = ["g", "b", "r"]
+    fig = plt.figure(1)
     ff = FreqFinder(params)
     for i, l in enumerate(losses):
         plt.plot(w, l, colors[i])
-        resFreq = ff.getResocnanceFrequencies(
+        resFreq = ff.getResonanceFrequencies(
             oscillations[i].multipoleN0, 10).real
         if isinstance(oscillations[i], SecHarmOscillation):
             resFreq /= 2.
@@ -88,4 +95,8 @@ if __name__ == "__main__":
     plt.plot(w, sum(losses), 'y')
     plt.xlim((wmin, wmax))
     plt.grid()
+    text = f"bt={beta}_wp={wp*6.6e-16}ev_de={nu}_epsInf={epsInf}_Vf={Vf/1e8}(1e8cms)_a={a*1e7}nm_epsD={epsD}"
+    plt.title(text)
+    filename = f"./loss_res_curves/" + text + ".png"
+    fig.savefig(filename)
     plt.show()
