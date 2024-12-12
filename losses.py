@@ -11,6 +11,14 @@ import pickle
 from SecHarmOscillation import SecHarmOscillation
 from freqFinder import FreqFinder
 
+wp = 1e16  # 5 / 6.6e-16
+nu = 0.02
+Vf = 1.0e8
+epsInf = 2
+a = 3.5e-7
+
+epsD = 3.5
+beta = .1
 
 def getLossesAtOneFreq(osc: Oscillation, w: float):
     psi = osc.getPsi(w)
@@ -44,17 +52,28 @@ if __name__ == "__main__":
 
     useCache = True
 
-    wp = 9 / 6.6e-16
-    nu = 0.02
-    Vf = 2.0e8
+    # # Na
+    # wp = 5 / 6.6e-16
+    # nu = 0.02
+    # Vf = 1.4e8
+    # epsInf = 3
+    # a = 3.5e-7
+
     V0 = np.sqrt(3 / 5) * Vf
     r0 = V0 / wp
-    epsInf = 3
-    a = 5e-7
     alpha = r0 / a
 
-    epsD = 5.4
-    beta = .1
+
+    # wp = 9 / 6.6e-16
+    # nu = 0.02
+    # Vf = 2.0e8
+    # V0 = np.sqrt(3 / 5) * Vf
+    # r0 = V0 / wp
+    # epsInf = 3
+    # a = 5e-7
+    # alpha = r0 / a
+    # epsD = 5.4
+    # beta = .1
     N = 300
 
     wmin = 0.2
@@ -63,7 +82,7 @@ if __name__ == "__main__":
     w = np.linspace(wmin, wmax, Nw)
 
     params = ClusterParameters(nu, alpha, epsD, epsInf)
-    params_dip = ClusterParameters(nu + 3/4*alpha, alpha, epsD, epsInf)
+    params_dip = ClusterParameters(nu + 3/4*Vf/a/wp, alpha, epsD, epsInf)
     oscillations: List[Oscillation] = []
     oscillations.append(SecHarmOscillation(N, 0, params, beta))
     oscillations.append(DipoleOscillation(N, params_dip))

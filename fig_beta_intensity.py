@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 _c = 3e10
 _m = 0.91e-27
 _e = 4.8e-10
-_V0 = np.sqrt(3 / 5) * 2e8
+_V0 = np.sqrt(3 / 5) * 1e8
 
 
 def E0(intensity):

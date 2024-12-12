@@ -8,14 +8,18 @@ from matplotlib.path import Path
 
 from tqdm import tqdm
 
-# AL
-wp = 9 / 6.6e-16
-nu = 0.03
-Vf = 2.0e8
+# XXX
+# wp = 5 / 6.6e-16
+# nu = 0.02
+# Vf = 1.4e8
+# epsInf = 3
+# a = 3.5e-7
+
+# XXX
+from losses import wp, nu, Vf, epsInf, a
+
 V0 = np.sqrt(3 / 5) * Vf
 r0 = V0 / wp
-epsInf = 3
-a = 5e-7
 alpha = r0/a
 
 

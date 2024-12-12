@@ -30,7 +30,7 @@ class FreqFinder:
         return np.sqrt(1. / (epsInf - eps) - nu ** 2 / 4 + 0j) + 0.5j * nu
 
     @staticmethod
-    def __epsFromKp(kp, r0, epsInf):
+    def epsFromKp(kp, r0, epsInf):
         x = np.square(kp * r0) * epsInf
         return x / (1 + x) * epsInf
 
@@ -42,14 +42,22 @@ class FreqFinder:
         return np.real((n * eps + epsD * (n + 1)) * djkp + epsD * n * (n + 1) * (eps - epsInf) / epsInf * j)
 
     @staticmethod
-    def __genGuessEps(n, N, r0, epsD, epsInf):
+    def genGuessEps(n, N, r0, epsD, epsInf):
         result = np.zeros(N)
         result[0] = -epsD * (n + 1.) / n if n != 0 else np.NaN
         if N == 1:
             return result
         vals = np.array(jn_zeros(n + 1, N - 1))
-        result[1:] = FreqFinder.__epsFromKp(vals, r0, epsInf)
+        result[1:] = FreqFinder.epsFromKp(vals, r0, epsInf)
         return result
+
+    @staticmethod
+    def genBetterGuessEpsForVps(n, N, r0, epsD, epsInf):
+        result = np.zeros(N)
+        x0 = np.array(jn_zeros(n + 1, N))
+        C = (1 + n / (n + 1) * epsInf / epsD) * r0 ** 2 * epsInf
+        kpa_guess = x0 + C / (1 / n - 2 * C) * x0
+        return FreqFinder.epsFromKp(kpa_guess, r0, epsInf)
 
     def __init__(self, parameters: ClusterParameters, xtol=1e-9):
         """
@@ -69,8 +77,7 @@ class FreqFinder:
     def zeroFunc(self, n, eps):
         return FreqFinder.__zeroFunction(n, eps, self.__r0, self.__epsD, self.__epsInf)
 
-    @cache
-    def getResonancePermittivities(self, n, Nz, epsD):
+    def getResonancePermittivities(self, n, Nz):
         """
             Returns the np.dnarray with values of nanoparticle dielectric function
             corresponding to the first Nz resonances of n-th multiplole mode of the nanopartilce.
@@ -81,7 +88,7 @@ class FreqFinder:
             return np.array([], dtype=np.complex64)
 
         # Nz + 1 is need for np.isclose(spRootResult.root, 0) case
-        guesses = FreqFinder.__genGuessEps(
+        guesses = FreqFinder.genGuessEps(
             n, Nz + 1, self.__r0, self.__epsD, self.__epsInf)
 
         if n == 0:
@@ -130,7 +137,7 @@ class FreqFinder:
             First element in array corresponds to the sufrace plasmon,
             subsequent ones correspond to the volume plasmons.
         """
-        resEps = self.getResonancePermittivities(n, Nz, self.epsD)
+        resEps = self.getResonancePermittivities(n, Nz)
         return FreqFinder.__wFromEps(resEps, self.__nu, self.__epsInf)
 
     # def optFunc(self,  n, eps) :
@@ -146,31 +153,33 @@ class FreqFinder:
 
 
 if __name__ == "__main__":
-    pass
-    # import matplotlib.pyplot as plt
-    # nu = 0.1
-    # r0 = .03
-    #
-    # ss.jn_zeros
-    # epsD = 1
-    # epsInf = 10
-    #
-    # ff = FreqFinder(r0, nu, epsD, epsInf)
-    # n = 1
-    # eps = np.linspace(-2, epsInf, 100000)
-    # Nz = 50
-    # zf = ff.zeroFunc(n, eps)
-    # zeros0 = FreqFinder._FreqFinder__genGuessEps(n, Nz, r0, epsD, epsInf)
-    # zeros = ff.getResocnancePermittivities(n, Nz)
-    # print(ff.getResocnanceFrequencies(n, Nz))
-    # # def F(eps): return ff.optFunc(n, eps)
-    # # res = minimize(F, x0=-2)
-    # # print(res)
-    # fig, ax = plt.subplots()
-    # ax.plot(eps, zf, 'r')
-    # ax.scatter(zeros0, np.zeros(Nz), c="black")
-    # ax.scatter(zeros, np.zeros_like(zeros), c="red")
-    # ax.grid()
-    # plt.ylim([-1, 1])
-    # plt.show()
-    # # ax.plot(eps, of, 'k')
+    from ClusterParameters import ClusterParameters
+    import matplotlib.pyplot as plt
+
+    nu = 0.001
+    r0 = .01
+
+    epsD = 3
+    epsInf = 6
+    params = ClusterParameters(nu, r0, epsD, epsInf)
+    ff = FreqFinder(params)
+    n = 1
+    eps = np.linspace(-2, epsInf, 100000)
+    Nz = 50
+    zf = ff.zeroFunc(n, eps)
+    zeros0 = FreqFinder.genGuessEps(n, Nz, r0, epsD, epsInf)
+    zeros1 = FreqFinder.genBetterGuessEpsForVps(n, Nz, r0, epsD, epsInf)
+    zeros = ff.getResonancePermittivities(n, Nz)
+    print(ff.getResonanceFrequencies(n, Nz))
+    # def F(eps): return ff.optFunc(n, eps)
+    # res = minimize(F, x0=-2)
+    # print(res)
+    fig, ax = plt.subplots()
+    ax.plot(eps, zf, 'r')
+    ax.scatter(zeros0, np.zeros(Nz), c="black")
+    ax.scatter(zeros1, np.zeros(Nz), c="green")
+    ax.scatter(zeros, np.zeros_like(zeros), c="red")
+    ax.grid()
+    plt.ylim([-1, 1])
+    plt.show()
+    # ax.plot(eps, of, 'k')
