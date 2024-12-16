@@ -1,18 +1,15 @@
-from typing import List, Dict, Tuple, Any
+import os.path
+import pickle
+from typing import List, Dict, Tuple
 
-from numpy import ndarray
+import matplotlib.pyplot as plt
+import numpy as np
 
 from ClusterParameters import ClusterParameters
 from DipoleOscillation import DipoleOscillation
 from Oscillation import Oscillation
-import numpy as np
-import matplotlib.pyplot as plt
-import os.path
-import pickle
-
 from SecHarmOscillation import SecHarmOscillation
 from freqFinder import FreqFinder
-
 from losses import getLosses, generateFilename
 
 
@@ -44,16 +41,25 @@ class IterableParams:
 
         return result
 
-nu = 0.02
-a = 3.5e-7
-beta = .1
+
+wp = 5.71 / 6.6e-16
+nu = 0.01#0.0275 / 5.71
+Vf = 1.07e8
+# nu = 0.02
+# a = 4e-7
+epsInf = 1
+# beta = .1
 
 useCache = True
 
 iterParams = IterableParams({
-    'wp': np.array([5, 6, 7, 8, 9, 10], dtype=np.float64) / 6.6e-16,
-    'Vf': np.array([1, 1.2, 1.4, 1.6, 1.8, 2], dtype=np.float64) * 1e8,
-    'epsInf': np.array([1, 2, 3, 4], dtype=np.float64)
+    # 'wp': np.array([5, 6, 7, 8, 9, 10], dtype=np.float64) / 6.6e-16,
+    # 'Vf': np.array([1, 1.2, 1.4, 1.6, 1.8, 2], dtype=np.float64) * 1e8,
+    # 'wp': np.array([5], dtype=np.float64) / 6.6e-16,
+    # 'Vf': np.array([1.5], dtype=np.float64) * 1e8,
+    # 'epsInf': np.array([2, 4], dtype=np.float64)
+    'beta': np.array([0.05], dtype=np.float64),
+    'a': np.array([4], dtype=np.float64) * 1e-7
 })
 
 wmin = 0.2
@@ -61,19 +67,19 @@ wmax = 1
 Nw = 1000
 w = np.linspace(wmin, wmax, Nw)
 
-N = 250
+N = 300
 
 for p in iterParams:
 
-    wp, Vf, epsInf = p
+    # wp, Vf, epsInf = p
+    beta, a = p
 
     V0 = np.sqrt(3 / 5) * Vf
     r0 = V0 / wp
     alpha = r0 / a
-    epsDk = list(np.linspace(1,3*epsInf/2,10))
+    epsDk = list(np.linspace(1, 2, 42)) + list(np.linspace(2, 3, 7))
 
     for epsD in epsDk:
-
 
         params = ClusterParameters(nu, alpha, epsD, epsInf)
         params_dip = ClusterParameters(nu + 3 / 4 * Vf / a / wp, alpha, epsD, epsInf)

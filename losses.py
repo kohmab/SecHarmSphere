@@ -11,14 +11,29 @@ import pickle
 from SecHarmOscillation import SecHarmOscillation
 from freqFinder import FreqFinder
 
-wp = 1e16  # 5 / 6.6e-16
-nu = 0.02
-Vf = 1.0e8
-epsInf = 2
-a = 3.5e-7
+# wp = 5.71 / 6.6e-16
+# nu = 0.0276 / 5.71
+# Vf = 1.07e8
+# epsInf = 1
+# a = 4e-7
+#
+# epsD = 1.25
+# beta = .02
 
-epsD = 3.5
+wp = 5 / 6.6e-16
+nu = 0.02
+Vf = 1.5e8
+epsInf = 2
+a = 4e-7
+
+epsD = 1.4
 beta = .1
+
+N = 500
+
+wmin = 0.2
+wmax = 1
+Nw = 1500
 
 def getLossesAtOneFreq(osc: Oscillation, w: float):
     psi = osc.getPsi(w)
@@ -74,11 +89,7 @@ if __name__ == "__main__":
     # alpha = r0 / a
     # epsD = 5.4
     # beta = .1
-    N = 300
 
-    wmin = 0.2
-    wmax = 0.6
-    Nw = 1200
     w = np.linspace(wmin, wmax, Nw)
 
     params = ClusterParameters(nu, alpha, epsD, epsInf)
