@@ -1,6 +1,7 @@
 .vscode
 __pycache__
 savedResults
+na_sphere_savedResults
 .*
 freq_dep
 
