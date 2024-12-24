@@ -17,16 +17,16 @@ import shelve
 # Sodium cluster and field:
 Vf = 1.07e8  # cm/s
 wp_eV = 5.71  # eV
-nu_eV = 0.0571  # eV
+nu_eV = 0.0276  # eV
 radius = 4e-7  # cm
 epsInf = 1
-field_intensity = 10e10  # W/cm^2
+field_intensity = 1e8  # W/cm^2
 
 # Program parameters
 epsDmin = 1
-epsDmax = 3
-NepsD = 100
-Nw = 100
+epsDmax = 2
+NepsD = 200
+Nw = 400
 Nr = 250
 #
 hash_str = generateFilename(*[x for x in locals().values() if isinstance(x, float) or isinstance(x, int)])
@@ -44,17 +44,11 @@ alpha = r0 / radius
 beta = calc_beta(field_intensity, V0, radius)
 #
 epsD = np.linspace(epsDmin, epsDmax, NepsD)
-par_dip = ClusPar(nu_dip, alpha, epsD[0], epsInf)
-par_sec_harm = ClusPar(nu, alpha, epsD[0], epsInf)
 
-# Oscillations
-oscillations: List[Oscillation] = []
-oscillations.append(OcsSh(Nr, 0, par_sec_harm, beta))
-oscillations.append(OscFh(Nr, par_dip))
-oscillations.append(OcsSh(Nr, 2, par_sec_harm, beta))
+par_dip = ClusPar(nu_dip, alpha, epsD[0], epsInf)
 
 # Preparations
-w0 = FrFnd(par_dip).getResonanceFrequencies(1, 1)
+w0 = FrFnd(par_dip).getResonanceFrequencies(1, 1).real
 w_range = w0 + np.linspace(-2, 2, Nw) * nu_dip
 max_losses = np.zeros_like(epsD)
 max_losses_freq = np.zeros_like(epsD)
@@ -67,14 +61,20 @@ filename = Path(__file__).parent / "na_sphere_savedResults" / hash_str
 
 if not filename.exists():
     for i, epsd in enumerate(epsD):
-        for osc in oscillations:
-            osc.set_medium_permittivity(epsd)
+        par_dip = ClusPar(nu_dip, alpha, epsd, epsInf)
+        par_sec_harm = ClusPar(nu, alpha, epsd, epsInf)
+
+        # Oscillations
+        oscillations: List[Oscillation] = []
+        oscillations.append(OcsSh(Nr, 0, par_sec_harm, beta))
+        oscillations.append(OscFh(Nr, par_dip))
+        oscillations.append(OcsSh(Nr, 2, par_sec_harm, beta))
 
         for m, ocs in enumerate(oscillations):
             losses[m] = getLosses(ocs, w_range)
 
         total_losses = sum(losses)
-        max_losses[i] = total_losses.max()
+        max_losses[i] = total_losses.real.max()
 
         max_losses_ind = np.argmax(total_losses)
 
