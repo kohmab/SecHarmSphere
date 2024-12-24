@@ -65,7 +65,7 @@ colors = {0: 'green', 1: 'blue', 2: 'red'}
 host.plot(resFreq[:, 1, 0], epsD, colors[1])
 
 for m in (0, 2):
-    for i in range(1, Nres):
+    for i in range(0, Nres):
         freqs = resFreq[:, m, i]
         ax1.plot(freqs, epsD, colors[m])
         patch = patch_from_dep(freqs, epsD, colors[m])

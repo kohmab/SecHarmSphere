@@ -26,12 +26,12 @@ Vf = 1.5e8
 epsInf = 2
 a = 4e-7
 
-epsD = 1.4
+epsD = 8.24
 beta = .1
 
 N = 500
 
-wmin = 0.2
+wmin = 0.02
 wmax = 1
 Nw = 1500
 

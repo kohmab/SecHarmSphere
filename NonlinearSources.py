@@ -31,8 +31,8 @@ class NonlinearSources():
         return self._phiFunctions
 
     def _memoize(function):
-        prevScalArg = np.Inf
-        prevVecArgSize = np.Inf
+        prevScalArg = np.inf
+        prevVecArgSize = np.inf
         savedValue = None
 
         def wrapper(self, vector, scalar):

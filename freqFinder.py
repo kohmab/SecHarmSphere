@@ -44,7 +44,7 @@ class FreqFinder:
     @staticmethod
     def genGuessEps(n, N, r0, epsD, epsInf):
         result = np.zeros(N)
-        result[0] = -epsD * (n + 1.) / n if n != 0 else np.NaN
+        result[0] = -epsD * (n + 1.) / n if n != 0 else np.nan
         if N == 1:
             return result
         vals = np.array(jn_zeros(n + 1, N - 1))
