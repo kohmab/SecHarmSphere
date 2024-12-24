@@ -61,9 +61,6 @@ class Oscillation(ABC):
     def N(self):
         return self.__N
 
-    def set_medium_permittivity(self, epsD):
-        self.__epsD = epsD
-
     @property
     def freq(self):
         return self.__w
