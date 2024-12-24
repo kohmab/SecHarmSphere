@@ -2,6 +2,7 @@
 __pycache__
 savedResults
 na_sphere_savedResults
+loss_*
 .*
 freq_dep
 
