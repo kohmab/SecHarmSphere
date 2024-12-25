@@ -1,35 +1,35 @@
-from os import path
+import shelve
 from pathlib import Path
 from typing import List
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 from ClusterParameters import ClusterParameters as ClusPar
 from DipoleOscillation import DipoleOscillation as OscFh
-from SecHarmOscillation import SecHarmOscillation as OcsSh
-from freqFinder import FreqFinder as FrFnd
 from Oscillation import Oscillation
-from losses import getLosses, generateFilename
+from SecHarmOscillation import SecHarmOscillation as OcsSh
 from fig_beta_intensity import calc_beta
-
-import shelve
+from freqFinder import FreqFinder as FrFnd
+from losses import getLosses, generateFilename
 
 # Sodium cluster and field:
 Vf = 1.07e8  # cm/s
 wp_eV = 5.71  # eV
-nu_eV = 0.0276  # eV
-radius = 4e-7  # cm
+nu_eV = 0.03  # 0.0276  # eV
+radius = 7e-7  # cm
 epsInf = 1
 field_intensity = 1e8  # W/cm^2
 
 # Program parameters
 epsDmin = 1
-epsDmax = 2
-NepsD = 200
-Nw = 400
-Nr = 250
+epsDmax = 1.8
+NepsD = 300
+Nw = 300
+Nr = 200
 #
-hash_str = generateFilename(*[x for x in locals().values() if isinstance(x, float) or isinstance(x, int)])
+hash_names = {k: v for k, v in locals().items() if isinstance(v, float) or isinstance(v, int)}
+hash_str = generateFilename(hash_names.values())
 #
 colors = {0: '#77AB30', 1: '#000000', 2: '#D95A19'}
 #
@@ -58,6 +58,8 @@ losses: List[np.ndarray] = [np.zeros(Nw) for i in range(3)]
 
 #
 filename = Path(__file__).parent / "na_sphere_savedResults" / hash_str
+if not filename.parent.exists():
+    filename.parent.mkdir()
 
 if not filename.exists():
     for i, epsd in enumerate(epsD):
@@ -82,17 +84,23 @@ if not filename.exists():
         w_range = w0 + np.linspace(-2, 2, Nw) * nu_dip
 
         for m in range(3):
-            mult_losses[m][i] = losses[m][max_losses_ind]
+            mult_losses[m][i] = losses[m].max()  # [max_losses_ind]
     else:
         datafile = shelve.open(str(filename))
         datafile["max_losses"] = max_losses
         datafile["max_losses_freq"] = max_losses_freq
         datafile["mult_losses"] = mult_losses
+        datafile.close()
+        with open(str(filename.parent / "processed_values.txt"), "a") as f:
+            line = ", ".join([f"{k} = {v}" for k, v in hash_names.items()])
+            f.write(line + "\n")
+
 else:
     datafile = shelve.open(str(filename))
     max_losses = datafile["max_losses"]
     max_losses_freq = datafile["max_losses_freq"]
     mult_losses = datafile["mult_losses"]
+    datafile.close()
 
 fig, ax = plt.subplots()
 ax.plot(epsD, max_losses, label='max loss')
