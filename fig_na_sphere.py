@@ -24,12 +24,13 @@ field_intensity = 1e8  # W/cm^2
 # Program parameters
 epsDmin = 1
 epsDmax = 1.8
-NepsD = 300
-Nw = 300
-Nr = 200
+NepsD = 4
+Nw = 3
+Nr = 4
 #
-hash_names = {k: v for k, v in locals().items() if isinstance(v, float) or isinstance(v, int)}
-hash_str = generateFilename(hash_names.values())
+sorted_locals = sorted(locals().items(), key=lambda item: item[0])
+hash_names = {k: v for k, v in sorted_locals if isinstance(v, float) or isinstance(v, int)}
+hash_str = generateFilename(*hash_names.values())
 #
 colors = {0: '#77AB30', 1: '#000000', 2: '#D95A19'}
 #
